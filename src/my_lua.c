@@ -237,11 +237,6 @@ userinput/commondialogboxlibrary/usingcommondialogboxes.asp */
 	}
 }
 
-#elif defined(DARWIN)
-/* On Mac, we define this function in my_lua.m, 
-   since we have to make some Objective-C calls. */
-int l_get_filename(lua_State* L);
-
 #else
 
 int l_get_filename(lua_State* L)
