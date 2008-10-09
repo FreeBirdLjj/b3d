@@ -1,7 +1,7 @@
 os:=$(shell uname)
-CFLAGS+=-g -Ilua-5.0.2/include -Ifreeglut-2.4.0/include/
+CFLAGS+=-g -Ilua-5.0.2/include -Ijpeg-6b
 
-LIBS+=-Llua-5.0.2/lib -llua -llualib -lm -ljpeg
+LIBS+=-Llua-5.0.2/lib -Ljpeg-6b -llua -llualib -lm -ljpeg
 
 GLLIBS:=-lglut -lGL -lGLU  # default
 ifeq ($(os),Darwin)

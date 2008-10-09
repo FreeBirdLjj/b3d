@@ -1,2 +1,20 @@
-To compile b3d, you'll need Lua version 5.0.2 and GLUT.
+Welcome to b3d, written by Issac Trotts (issac.trotts+b3d@gmail.com) 
+in consultation with Shawn Mikula in the labs of Edward G. Jones.
+
+To compile b3d, first make sure you have GLUT (the OpenGL Utility Toolkit)
+installed.  At the command line, do these steps:
+
+  cd lua-5.0.2
+  ./configure
+  make
+  cd ../jpeg-6b
+  ./configure
+  make
+  cd ..
+  make
+
+At this point you should have a working version of b3d.  You can run it like
+this:
+
+  src/b3d
 
