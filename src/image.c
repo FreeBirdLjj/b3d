@@ -53,13 +53,20 @@ static int l_image_draw_pixels(lua_State* L)
     return 0;
 }
 
-#ifdef WIN32
-double round(double x) { return floor(x+0.5); }
-double log2(double x) { return log(x)/log(2.0); }
+#ifndef FLOOR
+#define FLOOR(x) ((double)((int)x))
 #endif
 
-int is_power_of_two(int n) { return exp(round(log2(n)))==(double)n; }
-int next_highest_power_of_two(int n) { return (int)exp(ceil(log2(n))); }
+#ifndef ROUND
+#define ROUND(x) (FLOOR((x) + 0.5))
+#endif
+
+#ifndef LOG2
+#define LOG2(x) (log(x) / log(2.0))
+#endif
+
+int is_power_of_two(int n) { return exp(ROUND(LOG2(n)))==(double)n; }
+int next_highest_power_of_two(int n) { return (int)exp(ceil(LOG2(n))); }
 
 /* Not yet tested */
 static void send_padded_texture_to_gl(int level, int w, int h, GLubyte* pixels)
