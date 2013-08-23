@@ -1,7 +1,0 @@
-
-brain={
-    cortex=mesh.load("cortex.mesh"),
-    cerebellum=mesh.load("cerebellum.mesh"),
-    -- thalamus={ pulvinar }
-}
-
