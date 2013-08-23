@@ -11,7 +11,7 @@ steps:
 	./configure --disable-shared
 	cd ..
 	make
-```sh
+```
 At this point you should have a working version of b3d.  You can run it like
 this:
 ```sh
