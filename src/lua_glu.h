@@ -1,4 +1,4 @@
 #include <lua.h>
 
-int luaopen_glu(lua_State* L);
+int luaopen_glu(lua_State *L);
 

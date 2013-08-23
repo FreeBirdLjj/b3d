@@ -1,54 +1,27 @@
-os:=$(shell uname)
-CFLAGS+=-g -Ilua-5.0.2/include -Ijpeg-6b
+BIN = src/b3d
+JPEG_VER = 9
+LIBJPEG_DIR = jpeg-$(JPEG_VER)
+LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
+LIBLUA_VER = 5.2.2
+LIBLUA_DIR = lua-$(LIBLUA_VER)
+LIBLUA = $(LIBLUA_DIR)/src/liblua.a
 
-LIBS+=-Llua-5.0.2/lib -Ljpeg-6b -llua -llualib -lm -ljpeg
+CFLAGS = -O4 `llvm-config --cflags` -std=c89 -g -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR)
+LIBS = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs -llua -lm -ljpeg -lglut -lGL -lGLU -ldl
 
-GLLIBS:=-lglut -lGL -lGLU  # default
-ifeq ($(os),Darwin)
-CFLAGS+=-DDARWIN  
-GLLIBS:=-framework GLUT -framework OpenGL -framework Cocoa
-endif
-ifeq ($(os),MINGW32_NT-5.1)
-GLLIBS:=c:/lib/freeglut_static.lib -lopengl32 -lglu32
-endif
+.PHONY: all
+all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
-LIBS+=$(GLLIBS)
+$(LIBLUA):
+	cd $(LIBLUA_DIR)/src/; make linux
 
-ofiles:=src/main.o src/mesh.o src/view.o src/client.o src/my_lua.o src/utils.o\
-    src/globals.o src/lua_gl.o src/lua_glu.o src/lua_glut.o src/lbitlib.o \
-	src/image.o
-prog:=src/b3d
+$(LIBJPEG):
+	cd $(LIBJPEG_DIR)/; make
 
-$(prog): $(ofiles) 
-	gcc -o $(prog) $(ofiles) $(LIBS)
+$(BIN): src/main.o src/mesh.o src/view.o src/my_lua.o src/utils.o src/globals.o src/lua_gl.o src/lua_glu.o src/lua_glut.o src/image.o
+	$(CC) $(CFLAGS) -o $@ $? $(LIBS)
 
+.PHONY: clean
 clean:
-	rm -f $(ofiles) $(prog) 
+	rm -fr src/*.o src/b3d
 
-src/client.c: src/config.h src/globals.h src/utils.h 
-src/globals.c: src/view.h src/mesh.h src/globals.h src/my_lua.h 
-src/image.c: src/my_lua.h src/image.h 
-src/lbitlib.c: 
-src/lua_gl.c: src/my_opengl.h src/my_lua.h src/lua_bind.h 
-src/lua_glu.c: src/my_lua.h src/my_opengl.h src/lua_bind.h 
-src/lua_glut.c: src/my_opengl.h src/my_lua.h src/lua_bind.h 
-src/main.c: src/view.h src/mesh.h src/globals.h src/my_lua.h 
-src/mesh.c: src/globals.h src/utils.h src/mesh.h 
-src/my_lua.c: src/mesh.h src/my_lua.h src/globals.h src/utils.h src/view.h src/client.h src/lua_gl.h src/lua_glu.h src/lua_glut.h 
-src/utils.c: src/my_opengl.h 
-src/view.c: src/globals.h src/utils.h src/view.h src/client.h src/my_lua.h 
-src/zlib.c: src/zlib.h 
-src/client.h: 
-src/config.h: 
-src/globals.h: src/mesh.h src/view.h 
-src/image.h: src/my_opengl.h 
-src/lua_bind.h: 
-src/lua_gl.h: 
-src/lua_glu.h: 
-src/lua_glut.h: 
-src/mesh.h: src/my_lua.h src/my_opengl.h 
-src/my_lua.h: 
-src/my_opengl.h: 
-src/utils.h: 
-src/view.h: src/my_opengl.h src/mesh.h src/my_lua.h 
-src/zlib.h: 

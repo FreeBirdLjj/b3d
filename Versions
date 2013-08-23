@@ -1,6 +1,12 @@
 b3d
 ===
 
+Version 1h
+==========
+- Optimize some codes.
+- The 'F' key now turns on full screen mode.
+- Some keymap are changed.
+
 Version 1g
 ==========
 - The 3D view and thumbnail view are now in separate viewports, making the

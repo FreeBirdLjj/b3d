@@ -2,19 +2,17 @@
 #define BRAINMAPS_IMAGE_INCLUDED
 
 #include <lua.h>
-#include "my_opengl.h"
+#include <GL/glut.h>
 
 /* rgba image type */
-typedef struct 
-{
-    int nx,ny;
-    GLubyte* pixels;
-    GLboolean texture_is_valid;
-    GLuint gl_texture_name;
-}
-image_t;
+typedef struct{
+	int nx, ny;
+	GLubyte *pixels;
+	GLboolean texture_is_valid;
+	GLuint gl_texture_name;
+}image_t;
 
-int lua_openimage(lua_State* L);
+int lua_openimage(lua_State *L);
 
 #endif
 
