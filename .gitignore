@@ -1,5 +1,5 @@
 *.[ao]
-*.lo
+*.l[ao]
 jpeg-9/config.log
 jpeg-9/config.status
 jpeg-9/jconfig.h
@@ -13,6 +13,8 @@ jpeg-9/rdjpgcom
 jpeg-9/wrjpgcom
 jpeg-9/.deps/*
 jpeg-9/.libs/*
+lua-5.2.2/src/lua
+lua-5.2.2/src/luac
 src/b3d
 labels.txt
 
