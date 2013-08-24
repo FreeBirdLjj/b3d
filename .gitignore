@@ -6,13 +6,12 @@ jpeg-9/jconfig.h
 jpeg-9/libtool
 jpeg-9/Makefile
 jpeg-9/stamp-h1
-jpeg-9/cjpeg
-jpeg-9/djpeg
+jpeg-9/[cd]jpeg
 jpeg-9/jpegtran
 jpeg-9/rdjpgcom
 jpeg-9/wrjpgcom
-jpeg-9/.deps/*
-jpeg-9/.libs/*
+jpeg-9/.deps/
+jpeg-9/.libs/
 lua-5.2.2/src/lua
 lua-5.2.2/src/luac
 src/b3d
