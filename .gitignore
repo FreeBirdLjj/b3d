@@ -1,5 +1,4 @@
-*.o
-*.a
-*.po
-*.lo
+*.[ao]
+*.[lp]o
+labels.txt
 
