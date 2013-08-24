@@ -7,7 +7,7 @@ compiler.  Second make sure you have GLUT (the OpenGL Utility Toolkit)
 and readline (for the latest lua) installed.  At the command line, do these 
 steps:
 ```sh
-	cd ../jpeg-9
+	cd jpeg-9/
 	./configure --disable-shared
 	cd ..
 	make
