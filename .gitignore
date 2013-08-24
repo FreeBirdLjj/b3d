@@ -1,4 +1,4 @@
-*.[]ao]
+*.[ao]
 *.lo
 jpeg-9/config.log
 jpeg-9/config.status
@@ -13,5 +13,6 @@ jpeg-9/rdjpgcom
 jpeg-9/wrjpgcom
 jpeg-9/.deps/*
 jpeg-9/.libs/*
+src/b3d
 labels.txt
 
