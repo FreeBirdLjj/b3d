@@ -3,8 +3,6 @@
 #include "view.h"
 #include "my_lua.h"
 
-#define FPS
-
 #ifdef FPS
 int fps = 0;
 
