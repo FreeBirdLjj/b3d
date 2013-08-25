@@ -160,11 +160,10 @@ load_thumbnails("sagittal")
 local get_mouse_location = function()
 	if(locked_position) then
 		return unpack(locked_position)
-	else
-		local real_x, real_y
-			= mouse_xi, glut.glutGet(GLUT_WINDOW_HEIGHT)-mouse_yi-1
-		return glu.gluUnProject(real_x, real_y, gl.glReadPixels(real_x, real_y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT))
 	end
+	local real_x, real_y
+		= mouse_xi, glut.glutGet(GLUT_WINDOW_HEIGHT)-mouse_yi-1
+	return glu.gluUnProject(real_x, real_y, gl.glReadPixels(real_x, real_y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT))
 end
 
 do
@@ -440,12 +439,14 @@ glut.glutReshapeWindow(glut.glutGet(GLUT_SCREEN_WIDTH), glut.glutGet(GLUT_SCREEN
 
 -- It's not really zooming but moving the camera toward or away from the
 -- object being viewed.
-local default_camera_distance = math.sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/math.sin(fovy_deg*math.pi/360.0)/2.0
 
-local zoom_to_fit = function()
-	camera_distance = default_camera_distance
-	camera_pivot = center
-end
+local zoom_to_fit = (function()
+	local default_camera_distance = math.sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/math.sin(fovy_deg*math.pi/360.0)/2.0
+	return function()
+		camera_distance = default_camera_distance
+		camera_pivot = center
+	end
+end)()
 
 bm.set_idle_callback(nil)
 zoom_to_fit()
@@ -465,8 +466,7 @@ local restart = function()
 end
 
 local run_user_selected_lua_script = function()
-	local filename = bm.get_filename()
-	run(filename)
+	run(bm.get_filename())
 end
 
 local browse_coronal = function()
@@ -584,39 +584,41 @@ local make_stripe_fun = function(x, y, z, a)
 	end
 end
 
-local draw_mode_switch = {
-	[GL_FILL] = GL_LINE,
-	[GL_LINE] = GL_POINT,
-	[GL_POINT] = GL_FILL 
-}
-
-local cycle_through_draw_styles = function()
-	draw_mode = draw_mode_switch[draw_mode]
-	if(draw_mode==GL_LINE) then
-		gl.glDisable(GL_LINE_SMOOTH)
-	else
-		gl.glEnable(GL_LINE_SMOOTH)
+local cycle_through_draw_styles = (function()
+	local draw_mode_switch = {
+		[GL_FILL] = GL_LINE,
+		[GL_LINE] = GL_POINT,
+		[GL_POINT] = GL_FILL
+	}
+	return function()
+		draw_mode = draw_mode_switch[draw_mode]
+		if(draw_mode==GL_LINE) then
+			gl.glDisable(GL_LINE_SMOOTH)
+		else
+			gl.glEnable(GL_LINE_SMOOTH)
+		end
+		gl.glPolygonMode(GL_FRONT_AND_BACK, draw_mode)
 	end
-	gl.glPolygonMode(GL_FRONT_AND_BACK, draw_mode)
-end
+end)()
 
 local help = function()
 	bm.run_process_in_background(pager_path .. " help.txt")
 end
 
-local fullscreen = false
-local last_width, last_height
-	= 0, 0
-
-local toggle_full_screen =  function()
-	if(fullscreen) then
-		glut.glutReshapeWindow(last_width, last_height)
-	else
-		last_width, last_height = math.max(1, glut.glutGet(GLUT_WINDOW_WIDTH)), math.max(1, glut.glutGet(GLUT_WINDOW_HEIGHT))
-		glut.glutFullScreen()
+local toggle_full_screen =  (function()
+	local fullscreen = false
+	local last_width, last_height
+		= 0, 0
+	return function()
+		if(fullscreen) then
+			glut.glutReshapeWindow(last_width, last_height)
+		else
+			last_width, last_height = math.max(1, glut.glutGet(GLUT_WINDOW_WIDTH)), math.max(1, glut.glutGet(GLUT_WINDOW_HEIGHT))
+			glut.glutFullScreen()
+		end
+		fullscreen = not(fullscreen)
 	end
-	fullscreen = not(fullscreen)
-end
+end)()
 
 local quit = function()
 	os.exit(0)
@@ -626,6 +628,7 @@ local no_stripes = function()
 	candy_striping = false
 end
 
+-- Global function add_label() for executing labels.txt
 add_label = function(x, y, z, text)
 	print(string.format("adding label: %3.3f %3.3f %3.3f %s", x, y, z, text))
 	labels[#labels+1] = {x, y, z, text}
@@ -659,39 +662,6 @@ local add_mouse_label = function()
 	add_label(x, y, z, "*")
 end
 
----------------
--- Key bindings 
----------------
-
-local key_bindings = {
-	['C'] = function()
-			print(string.format("camera: %.3f %.3f %.3f", calc_camera_coords()))
-		end,
-	['L'] = load_labels,
-	['m'] = cycle_through_draw_styles,
-	['P'] =	function()
-			print(string.format("%4.3f %4.3f %4.3f", get_mouse_location())) 
-		end,
-	['p'] = add_mouse_label,
-	['?'] = help,
-	['r'] = restart,
-	['h'] = browse_horizontal,
-	['s'] = browse_sagittal,
-	['c'] = browse_coronal,
-	['b'] = browse_all_three,
-	['f'] = zoom_to_fit,
-	['i'] = zoom_in,
-	['t'] = toggle_thumbnails,
-	['F'] = toggle_full_screen,
-	['x'] = make_stripe_fun(2, 0, 0, 0),
-	['y'] = make_stripe_fun(0, 2, 0, 0),
-	['z'] = make_stripe_fun(0, 0, 2, 0),
-	['n'] = no_stripes,
-	['l'] = toggle_position_lock,
-	['q'] = quit,
--- Bring up a lua command prompt, for power users
-	[':'] = begin_command_mode
-}
 ---------------
 -- Menu
 ---------------
@@ -761,45 +731,79 @@ on_passive_motion = function(xi, yi)
 	glut.glutPostRedisplay()
 end
 
-on_keyboard = function(key, xi, yi)
-	if(kb_cmd_mode==1) then
-		-- If it's Enter, then try to execute the command.
-		if(key==13) then
-			local loaded_cmd = loadstring(command)
-			if(loaded_cmd) then 
-				local status, result = pcall(loaded_cmd)
-				if(status) then
-					if(result) then
-						print(result)
+on_keyboard = (function()
+	---------------
+	-- Key bindings 
+	---------------
+	local key_bindings = {
+		['C'] = function()
+				print(string.format("camera: %.3f %.3f %.3f", calc_camera_coords()))
+			end,
+		['L'] = load_labels,
+		['m'] = cycle_through_draw_styles,
+		['P'] =	function()
+				print(string.format("%4.3f %4.3f %4.3f", get_mouse_location())) 
+			end,
+		['p'] = add_mouse_label,
+		['?'] = help,
+		['r'] = restart,
+		['h'] = browse_horizontal,
+		['s'] = browse_sagittal,
+		['c'] = browse_coronal,
+		['b'] = browse_all_three,
+		['f'] = zoom_to_fit,
+		['i'] = zoom_in,
+		['t'] = toggle_thumbnails,
+		['F'] = toggle_full_screen,
+		['x'] = make_stripe_fun(2, 0, 0, 0),
+		['y'] = make_stripe_fun(0, 2, 0, 0),
+		['z'] = make_stripe_fun(0, 0, 2, 0),
+		['n'] = no_stripes,
+		['l'] = toggle_position_lock,
+		['q'] = quit,
+	-- Bring up a lua command prompt, for power users
+		[':'] = begin_command_mode
+	}
+	return function(key, xi, yi)
+		if(kb_cmd_mode==1) then
+			-- If it's Enter, then try to execute the command.
+			if(key==13) then
+				local loaded_cmd = loadstring(command)
+				if(loaded_cmd) then 
+					local status, result = pcall(loaded_cmd)
+					if(status) then
+						if(result) then
+							print(result)
+						end
+					else
+						bm.warn("Lua error. ", result)
 					end
 				else
-					bm.warn("Lua error. ", result)
+					bm.warn("Lua syntax error.")
 				end
-			else
-				bm.warn("Lua syntax error.")
-			end
-			km_cmd_mode = 0
-			command = ""
+				km_cmd_mode = 0
+				command = ""
+				
+			-- If it's backspace or delete, then try to delete the last
+			-- character in the command.
+			elseif(key==8 or key==127) then
+				command = string.sub(command, 1, -2)
 			
-		-- If it's backspace or delete, then try to delete the last
-		-- character in the command.
-		elseif(key==8 or key==127) then
-			command = string.sub(command, 1, -2)
-		
-		-- If it's Esc or ctrl-c, then abort the command
-		elseif(key==27 or key==3) then
-			kb_cmd_mode = 0
-			command = ""
+			-- If it's Esc or ctrl-c, then abort the command
+			elseif(key==27 or key==3) then
+				kb_cmd_mode = 0
+				command = ""
+			else
+				-- Otherwise, add the character to the command.
+				command = command .. string.char(key)		
+			end
 		else
-			-- Otherwise, add the character to the command.
-			command = command .. string.char(key)		
+			local f = key_bindings[string.char(key)]
+			if(f) then 
+				f(xi, yi) 
+				glut.glutPostRedisplay()
+			end
 		end
-	else
-		local f = key_bindings[string.char(key)]
-		if(f) then 
-			f(xi, yi) 
-			glut.glutPostRedisplay()
-		end
+		glut.glutPostRedisplay()
 	end
-	glut.glutPostRedisplay()
-end
+end)()
