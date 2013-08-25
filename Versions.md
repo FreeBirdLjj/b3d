@@ -1,6 +1,13 @@
 b3d
 ===
 
+Version 1i
+==========
+DONE:
+
+TODO:
+- Show different objects of different levels in different color.(If accomplished, the data structure may be changed.)
+
 Version 1h
 ==========
 - Optimize some codes.
