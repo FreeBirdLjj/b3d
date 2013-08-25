@@ -1,5 +1,7 @@
 *.[ao]
 *.l[ao]
+*.out
+tags
 jpeg-9/config.log
 jpeg-9/config.status
 jpeg-9/jconfig.h
