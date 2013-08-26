@@ -333,7 +333,7 @@ on_display = function()
 	gl.glLoadIdentity()
 	local h = math.max(1, glut.glutGet(GLUT_WINDOW_HEIGHT))
 	gl.glOrtho(1, math.max(1, glut.glutGet(GLUT_WINDOW_WIDTH)), 1, h, -1, 1)
-	local str = ""
+	local str = nil
 	-- Only draw the 3D mouse coords if the mouse is probably over the
 	-- surface.  This hack on the next line should be replaced with something
 	-- smarter.
@@ -440,13 +440,10 @@ glut.glutReshapeWindow(glut.glutGet(GLUT_SCREEN_WIDTH), glut.glutGet(GLUT_SCREEN
 -- It's not really zooming but moving the camera toward or away from the
 -- object being viewed.
 
-local zoom_to_fit = (function()
-	local default_camera_distance = math.sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/math.sin(fovy_deg*math.pi/360.0)/2.0
-	return function()
-		camera_distance = default_camera_distance
-		camera_pivot = center
-	end
-end)()
+local zoom_to_fit = function()
+	camera_distance = math.sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/math.sin(fovy_deg*math.pi/360.0)/2.0
+	camera_pivot = center
+end
 
 bm.set_idle_callback(nil)
 zoom_to_fit()
