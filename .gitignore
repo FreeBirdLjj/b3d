@@ -1,6 +1,7 @@
 *.[ao]
 *.l[ao]
 *.out
+*.tar.xz
 tags
 jpeg-9/config.log
 jpeg-9/config.status
