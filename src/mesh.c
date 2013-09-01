@@ -43,8 +43,8 @@ void calc_face_normal(mesh_t *mesh, float n[3], int fi){
 /* This function is intended to only be called once, to construct the display 
  * list.  Thereafter the display list should be used. */
 void mesh_draw(mesh_t *mesh){
-	fprintf(stderr, "Regenerating mesh for OpenGL...\n");
-	fprintf(stderr, "Normal style: ");
+	fprintf(stderr, "Regenerating mesh for OpenGL...\n"
+			"Normal style: ");
 	switch(normal_style){
 	case NS_DIV_BY_AREA:
 		fprintf(stderr, "div by area\n");
@@ -99,14 +99,14 @@ void mesh_draw(mesh_t *mesh){
 					break;
 				case NS_MUL_BY_AREA:
 				case NS_FLAT:
-					normalizer = 1.0f;		/* not used */
+					normalizer = 1.0f;	/* not used */
 					break;
 				default:
 					fprintf(stderr, "bad normal style\n");
 					normalizer = 1.0f;
 					break;
 				}
-				n[j] /= (normalizer==0.0f? 1.0 : normalizer); 
+				n[j] /= normalizer==0.0f? 1.0 : normalizer;
 			}
 
 			for(j = 0; j<3; j++)
@@ -247,7 +247,7 @@ int mesh_load(mesh_t *mesh, FILE *file){
 	mesh_draw(mesh);
 	glEndList();
 
-	return 0;	/* ok */
+	return 0;						/* ok */
 }
 
 /* Lua book, p. 250 */
