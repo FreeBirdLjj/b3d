@@ -129,9 +129,8 @@ local load_thumbnails = function(orient)
 	local file = io.open("thumbnails/" .. orient .. "-labelled/names")
 	for filename in file:lines() do
 		bm_names[i] = string.sub(filename, 1, -5)
-		local img = image.load("thumbnails/" .. orient .. "-labelled/" .. filename)
-		bm_thumbnails[i] = img
-		local width, height = img:get_size()
+		bm_thumbnails[i] = image.load("thumbnails/" .. orient .. "-labelled/" .. filename)
+		local width, height = bm_thumbnails[i]:get_size()
 		bm_max_width = math.max(width, bm_max_width)
 		bm_max_height = math.max(height, bm_max_height)
 		i = i+1
