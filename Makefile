@@ -6,7 +6,7 @@ LIBLUA_VER = 5.2.2
 LIBLUA_DIR = lua-$(LIBLUA_VER)
 LIBLUA = $(LIBLUA_DIR)/src/liblua.a
 
-CFLAGS = -O4 `llvm-config --cflags` -std=c89 -g -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR)
+CFLAGS = -O4 `llvm-config --cflags` -g -DDEBUG -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR)
 LIBS = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs -llua -lm -ljpeg -lglut -lGL -lGLU -ldl
 
 .PHONY: all
