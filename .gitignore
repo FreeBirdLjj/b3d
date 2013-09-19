@@ -17,6 +17,6 @@ jpeg-9/.deps/
 jpeg-9/.libs/
 lua-5.2.2/src/lua
 lua-5.2.2/src/luac
-src/b3d
+bin/*
 labels.txt
 

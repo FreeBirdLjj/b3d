@@ -15,5 +15,5 @@ steps:
 At this point you should have a working version of b3d.  You can run it like
 this:
 ```sh
-	src/b3d
+	bin/b3d
 ```

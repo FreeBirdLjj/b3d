@@ -1,4 +1,4 @@
-BIN = src/b3d
+BIN = bin/b3d
 JPEG_VER = 9
 LIBJPEG_DIR = jpeg-$(JPEG_VER)
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
@@ -19,9 +19,10 @@ $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/; make
 
 $(BIN): src/main.o src/mesh.o src/view.o src/my_lua.o src/utils.o src/globals.o src/lua_gl.o src/lua_glu.o src/lua_glut.o src/image.o
+	@mkdir -p bin/
 	$(CC) $(CFLAGS) -o $@ $? $(LIBS)
 
 .PHONY: clean
 clean:
-	rm -fr src/*.o src/b3d
+	-rm -fr src/*.o $(BIN)
 
