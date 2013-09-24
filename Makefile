@@ -20,7 +20,7 @@ $(LIBJPEG):
 
 $(BIN): src/main.o src/mesh.o src/view.o src/my_lua.o src/utils.o src/globals.o src/lua_gl.o src/lua_glu.o src/lua_glut.o src/image.o
 	@mkdir -p bin/
-	$(CC) $(CFLAGS) -o $@ $? $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 .PHONY: clean
 clean:
