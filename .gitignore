@@ -1,3 +1,6 @@
+*~
+*.swp
+#*#
 *.[ao]
 *.l[ao]
 *.out
@@ -19,4 +22,3 @@ lua-5.2.2/src/lua
 lua-5.2.2/src/luac
 bin/*
 labels.txt
-
