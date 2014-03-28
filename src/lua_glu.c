@@ -91,7 +91,7 @@ static const struct luaL_Reg glu_lib[] = {
 };
 
 int luaopen_glu(lua_State *L){
-	luaL_openlib(L, "glu", glu_lib, 0);
+	luaL_newlib(L, glu_lib);
 	return 1;
 }
 

@@ -152,7 +152,7 @@ load_thumbnails("horizontal")
 -- Load sagittal thumbnails
 load_thumbnails("sagittal")
 
--- wx, wy, wz are the returned world coordinates 
+-- wx, wy, wz are the returned world coordinates
 -- Reference: redbook/unproject.c & one of the NeHe demos
 -- The name is a bit misleading, since the result can be
 -- different if the position is locked.
@@ -249,14 +249,14 @@ on_display = function()
 	gl.glEnable(GL_LIGHTING)
 	gl.glPushMatrix()
 	if(candy_striping) then
-		gl.glEnable(GL_TEXTURE_1D) 
+		gl.glEnable(GL_TEXTURE_1D)
 		gl.glEnable(GL_TEXTURE_GEN_S)
 	end
 	for _, mesh in pairs(meshes) do
 		mesh:draw()
 	end
 	if(candy_striping) then
-		gl.glDisable(GL_TEXTURE_1D) 
+		gl.glDisable(GL_TEXTURE_1D)
 		gl.glDisable(GL_TEXTURE_GEN_S)
 	end
 	gl.glPopMatrix()
@@ -274,9 +274,9 @@ on_display = function()
 	local x, y, z
 		= get_mouse_location()
 	if(locked_position) then
-		
+
 		gl.glDepthMask(false)
-		
+
 		local box = {
 			scene_box[1]-5,
 			scene_box[2]-5,
@@ -345,7 +345,7 @@ on_display = function()
 		draw_bitmap_string(GLUT_BITMAP_8_BY_13, str)
 	end
 
-	-- More here: print out other info of interest: frame rate, etc. 
+	-- More here: print out other info of interest: frame rate, etc.
 	gl.glRasterPos(10, 10)
 	if(kb_cmd_mode==1) then
 		draw_bitmap_string(GLUT_BITMAP_8_BY_13, "lua> " .. command .. "|")
@@ -373,8 +373,8 @@ on_display = function()
 		gl.glPointSize(1)
 		gl.glColor(0.0, 0.0, 0.0, 1.0)
 	end
-	if(drawing_thumbnails) then 
-		-- These have to be done while we still have the GL 
+	if(drawing_thumbnails) then
+		-- These have to be done while we still have the GL
 		-- matrices and viewport set up from the 3D drawing.
 		local icor, ihor, isag
 			= get_coronal_index_from_mouse(), get_horizontal_index_from_mouse(), get_sagittal_index_from_mouse()
@@ -392,7 +392,7 @@ on_display = function()
 
 		-- Figure out which section to draw, based on where the mouse is
 		-- pointing in 3D.
-		gl.glPixelZoom(1.0, -1.0)	-- GL draws images upside down by default.  
+		gl.glPixelZoom(1.0, -1.0)	-- GL draws images upside down by default.
 
 		-- Draw a white square behind all the images
 		gl.glColor(1, 1, 1)
@@ -410,7 +410,7 @@ on_display = function()
 		h = h-1
 		if(cor_img) then
 			gl.glRasterPos(1, h)
-			cor_img:draw_pixels() 
+			cor_img:draw_pixels()
 		end
 
 		h = h-bm.coronal_max_height-1
@@ -418,14 +418,14 @@ on_display = function()
 		local sag_img = bm.sagittal_thumbnails[isag]
 		if(sag_img) then
 			gl.glRasterPos(1, h)
-			sag_img:draw_pixels() 
+			sag_img:draw_pixels()
 		end
 		h = h-bm.sagittal_max_height-1
 
 		local hor_img = bm.horizontal_thumbnails[ihor]
 		if(hor_img) then
 			gl.glRasterPos(1, h)
-			hor_img:draw_pixels() 
+			hor_img:draw_pixels()
 		end
 
 		set_up_3D_viewport_and_matrices()	-- put it back so we can calc mouse coords
@@ -450,9 +450,9 @@ zoom_to_fit()
 -- Run the given Lua file
 local run = function(filename)
 	local cmd = loadfile(filename)
-	if(cmd) then 
-		cmd() 
-	else 
+	if(cmd) then
+		cmd()
+	else
 		bm.warn("Could not run " .. filename)
 	end
 end
@@ -486,7 +486,7 @@ local browse_sagittal = function()
 	end
 end
 
--- Launch web browsers on brainmaps.org for the three sections specified by 
+-- Launch web browsers on brainmaps.org for the three sections specified by
 -- the mouse cursor's projection onto the brain surface.
 local browse_all_three = function()
 	browse_coronal()
@@ -497,7 +497,7 @@ end
 local toggle_transparency = function()
 	doing_transparency = not(doing_transparency)
 	if(doing_transparency) then
-		mesh_color[4] = 0.5		
+		mesh_color[4] = 0.5
 		gl.glDisable(GL_DEPTH_TEST)
 	else
 		mesh_color[4] = 1.0
@@ -505,7 +505,7 @@ local toggle_transparency = function()
 	end
 end
 
--- This sets up a temporary idle callback that gradually changes the 
+-- This sets up a temporary idle callback that gradually changes the
 -- camera focus to the point in 3D space pointed to by the mouse,
 -- while reducing the distance between the camera and that point.
 local zoom_in = function()
@@ -523,7 +523,7 @@ local zoom_in = function()
 				bm.set_idle_callback(nil)
 			end
 			-- This polynomial u(t) satisfies u(0)=0, u(1)=1,
-			-- u'(0)=0, u'(1)=0, so we get a smoother transition than 
+			-- u'(0)=0, u'(1)=0, so we get a smoother transition than
 			-- we would get by using a linear ramp.
 			local u = (3-2*t)*t^2
 			local v = 1.0-u
@@ -550,7 +550,7 @@ local toggle_position_lock = function()
 	end
 end
 
--- Parts of this function were borrowed from the OpenGL texgen demo. 
+-- Parts of this function were borrowed from the OpenGL texgen demo.
 local make_stripe_fun = function(x, y, z, a)
 	return function()
 		local stripe_texture = {}
@@ -698,7 +698,7 @@ end
 
 on_motion = function(xi, yi)
 	if(shift_is_pressed) then
-		-- move camera closer in or further out 
+		-- move camera closer in or further out
 		camera_distance = camera_distance/math.exp(0.01*(yi-mouse_yi))
 	elseif(ctrl_is_pressed) then
 		local h = math.max(1, glut.glutGet(GLUT_WINDOW_HEIGHT))
@@ -712,7 +712,7 @@ on_motion = function(xi, yi)
 		for i = 1, 3 do
 			camera_offset[i] = camera_offset[i]+edges[i]*(p[i]-pprev[i])
 		end
-	else 
+	else
 		y_angle_deg = y_angle_deg+0.5*(xi-mouse_xi)
 		x_angle_deg = x_angle_deg-0.5*(yi-mouse_yi)
 	end
@@ -729,7 +729,7 @@ end
 
 on_keyboard = (function()
 	---------------
-	-- Key bindings 
+	-- Key bindings
 	---------------
 	local key_bindings = {
 		['C'] = function()
@@ -738,7 +738,7 @@ on_keyboard = (function()
 		['L'] = load_labels,
 		['m'] = cycle_through_draw_styles,
 		['P'] =	function()
-				print(string.format("%4.3f %4.3f %4.3f", get_mouse_location())) 
+				print(string.format("%4.3f %4.3f %4.3f", get_mouse_location()))
 			end,
 		['p'] = add_mouse_label,
 		['?'] = help,
@@ -765,7 +765,7 @@ on_keyboard = (function()
 			-- If it's Enter, then try to execute the command.
 			if(key==13) then
 				local loaded_cmd = loadstring(command)
-				if(loaded_cmd) then 
+				if(loaded_cmd) then
 					local status, result = pcall(loaded_cmd)
 					if(status) then
 						if(result) then
@@ -779,24 +779,24 @@ on_keyboard = (function()
 				end
 				km_cmd_mode = 0
 				command = ""
-				
+
 			-- If it's backspace or delete, then try to delete the last
 			-- character in the command.
 			elseif(key==8 or key==127) then
 				command = string.sub(command, 1, -2)
-			
+
 			-- If it's Esc or ctrl-c, then abort the command
 			elseif(key==27 or key==3) then
 				kb_cmd_mode = 0
 				command = ""
 			else
 				-- Otherwise, add the character to the command.
-				command = command .. string.char(key)		
+				command = command .. string.char(key)
 			end
 		else
 			local f = key_bindings[string.char(key)]
-			if(f) then 
-				f(xi, yi) 
+			if(f) then
+				f(xi, yi)
 				glut.glutPostRedisplay()
 			end
 		end

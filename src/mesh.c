@@ -1,6 +1,7 @@
 #include "globals.h"
 #include <stdio.h>
-
+#include <ctype.h>
+#include <math.h>
 #include "utils.h"
 #include "mesh.h"
 
@@ -316,8 +317,8 @@ int luaopen_mesh(lua_State *L){
 	lua_pushvalue(L, -2);	/* pushes the metatable */
 	lua_settable(L, -3);	/* metatable.__index = metatable */
 
-	luaL_openlib(L, NULL, meshlib_m, 0);
-	luaL_openlib(L, "mesh", meshlib_f, 0);
+	luaL_setfuncs(L, meshlib_m, 0);
+	luaL_newlib(L, meshlib_f);
 	return 1;
 }
 

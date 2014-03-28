@@ -87,8 +87,8 @@ int lua_openimage(lua_State *L){
 	lua_pushvalue(L, -2);	/* pushes the metatable */
 	lua_settable(L, -3);	/* metatable.__index = metatable */
 
-	luaL_openlib(L, NULL, imagelib_m, 0);
-	luaL_openlib(L, "image", imagelib_f, 0);
+	luaL_setfuncs(L, imagelib_m, 0);
+	luaL_newlib(L, imagelib_f);
 	return 1;
 }
 
