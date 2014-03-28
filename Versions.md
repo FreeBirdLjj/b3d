@@ -2,11 +2,8 @@
 
 ## Version 1i
 
-DONE:
-
-TODO:
-
-- Show different objects of different levels in different color.(If accomplished, the data structure may be changed.)
+- Update for lua-5.2.3
+- Update for libjpeg-9a
 
 ## Version 1h
 
