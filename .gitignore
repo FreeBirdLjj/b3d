@@ -16,8 +16,8 @@ jpeg-9a/[cd]jpeg
 jpeg-9a/jpegtran
 jpeg-9a/rdjpgcom
 jpeg-9a/wrjpgcom
-jpeg-9a/.deps/
-jpeg-9a/.libs/
+jpeg-9a/.deps/*
+jpeg-9a/.libs/*
 lua-5.2.3/src/lua
 lua-5.2.3/src/luac
 bin/*
