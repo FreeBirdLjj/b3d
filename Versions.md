@@ -4,6 +4,7 @@
 
 - Update for lua-5.2.3
 - Update for libjpeg-9a
+- Bugfix: float can't be arshifted.
 
 ## Version 1h
 
