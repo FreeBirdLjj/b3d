@@ -1,3 +1,5 @@
+
+-- Libraries
 local pairs = pairs
 local string = string
 local gl = gl
@@ -8,6 +10,63 @@ local math = math
 local bit32 = bit32
 local os = os
 local bm = bm
+
+-- Functions
+local arshift = bit32.arshift
+local bor = bit32.bor
+
+local cos = math.cos
+
+local floor = math.floor
+
+local glBegin = gl.glBegin
+local glClear = gl.glClear
+local glClearColor = gl.glClearColor
+local glColor = gl.glColor
+local glDepthMask = gl.glDepthMask
+local glDisable = gl.glDisable
+local glEnable = gl.glEnable
+local glEnd = gl.glEnd
+local glFlush = gl.glFlush
+local glGetDoublev = gl.glGetDoublev
+local glLoadIdentity = gl.glLoadIdentity
+local glMaterial = gl.glMaterial
+local glMatrixMode = gl.glMatrixMode
+local glOrtho = gl.glOrtho
+local glPixelZoom = gl.glPixelZoom
+local glPointSize = gl.glPointSize
+local glPopMatrix = gl.glPopMatrix
+local glPushMatrix = gl.glPushMatrix
+local glRasterPos = gl.glRasterPos
+local glReadPixels = gl.glReadPixels
+local glRotated = gl.glRotated
+local glScaled = gl.glScaled
+local glTranslated = gl.glTranslated
+local glVertex = gl.glVertex
+local glViewport = gl.glViewport
+
+local gluPerspective = glu.gluPerspective
+local gluUnProject = glu.gluUnProject
+
+local glutBitmapCharacter = glut.glutBitmapCharacter
+local glutFullScreen = glut.glutFullScreen
+local glutGet = glut.glutGet
+local glutPostRedisplay = glut.glutPostRedisplay
+local glutReshapeWindow = glut.glutReshapeWindow
+local glutSwapBuffers = glut.glutSwapBuffers
+local glutWireCube = glut.glutWireCube
+
+local load = image.load
+
+local max = math.max
+local min = math.min
+
+local open = io.open
+
+local sin = math.sin
+local sqrt = math.sqrt
+
+local unpack = unpack
 
 -- Data types
 local GL_FLOAT			= 0x1406
@@ -116,7 +175,7 @@ local candy_striping, doing_transparency, drawing_thumbnails, ctrl_is_pressed, s
 	= false, false, true, false, false
 
 local reverse = function(t)
-	for i = 1, bit32.arshift(#t, 1) do
+	for i = 1, arshift(#t, 1) do
 		t[i], t[#t-(i-1)] = t[#t-(i-1)], t[i]
 	end
 end
@@ -126,13 +185,13 @@ local load_thumbnails = function(orient)
 		= {}, {}
 	local bm_max_width, bm_max_height, i
 		= 1, 1, 1
-	local file = io.open("thumbnails/" .. orient .. "-labelled/names")
+	local file = open("thumbnails/" .. orient .. "-labelled/names")
 	for filename in file:lines() do
 		bm_names[i] = string.sub(filename, 1, -5)
-		bm_thumbnails[i] = image.load("thumbnails/" .. orient .. "-labelled/" .. filename)
+		bm_thumbnails[i] = load("thumbnails/" .. orient .. "-labelled/" .. filename)
 		local width, height = bm_thumbnails[i]:get_size()
-		bm_max_width = math.max(width, bm_max_width)
-		bm_max_height = math.max(height, bm_max_height)
+		bm_max_width = max(width, bm_max_width)
+		bm_max_height = max(height, bm_max_height)
 		i = i+1
 	end
 	bm[orient .. "_thumbnails"] = bm_thumbnails
@@ -161,22 +220,22 @@ local get_mouse_location = function()
 		return unpack(locked_position)
 	end
 	local real_x, real_y
-		= mouse_xi, glut.glutGet(GLUT_WINDOW_HEIGHT)-mouse_yi-1
-	return glu.gluUnProject(real_x, real_y, gl.glReadPixels(real_x, real_y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT))
+		= mouse_xi, glutGet(GLUT_WINDOW_HEIGHT)-mouse_yi-1
+	return gluUnProject(real_x, real_y, glReadPixels(real_x, real_y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT))
 end
 
 do
 	local boxes = {}
 	local i = 1
 	for _, mesh in pairs(meshes) do
-		boxes[i] = {mesh:get_bounds()}
+		boxes[i] = { mesh:get_bounds() }
 		i = i+1
 	end
 	if(i==1) then
 		error("calc_max_bounds needs at least one box in the list")
 	end
 	scene_box = boxes[1]
-	local set_scene = { math.min, math.min, math.min, math.max, math.max, math.max }
+	local set_scene = { min, min, min, max, max, max }
 	for j = 2, i-1 do
 		for k = 1, 6 do
 			scene_box[k] = set_scene(scene_box[k], boxes[j][k])
@@ -184,22 +243,22 @@ do
 	end
 end
 
-local center = { bit32.arshift(scene_box[1]+scene_box[4], 1), bit32.arshift(scene_box[2]+scene_box[5], 1), bit32.arshift(scene_box[3]+scene_box[6], 1) }
+local center = { arshift(scene_box[1]+scene_box[4], 1), arshift(scene_box[2]+scene_box[5], 1), arshift(scene_box[3]+scene_box[6], 1) }
 local edges = { scene_box[4]-scene_box[1], scene_box[5]-scene_box[2], scene_box[6]-scene_box[3] }
 
 local get_coronal_index_from_mouse = function()
 	local x, y, z = get_mouse_location()
-	return math.floor((#bm.coronal_names)*(z-scene_box[3])/edges[3])
+	return floor((#bm.coronal_names)*(z-scene_box[3])/edges[3])
 end
 
 local get_horizontal_index_from_mouse = function()
 	local x, y, z = get_mouse_location()
-	return math.floor((#bm.horizontal_names)*(y-scene_box[2])/edges[2])
+	return floor((#bm.horizontal_names)*(y-scene_box[2])/edges[2])
 end
 
 local get_sagittal_index_from_mouse = function()
 	local x, y, z = get_mouse_location()
-	return math.floor((#bm.sagittal_names)*(x-scene_box[1])/edges[1])
+	return floor((#bm.sagittal_names)*(x-scene_box[1])/edges[1])
 end
 
 -------
@@ -208,66 +267,66 @@ end
 
 local draw_bitmap_string = function(font, s, x, y, z)
 	if(x) then
-		gl.glRasterPos(x, y, z)
+		glRasterPos(x, y, z)
 	end
 	for i = 1, string.len(s) do
-		glut.glutBitmapCharacter(font, string.byte(s, i))
+		glutBitmapCharacter(font, string.byte(s, i))
 	end
 end
 
 local set_up_3D_viewport_and_matrices = function()
-	local w, h = math.max(1, glut.glutGet(GLUT_WINDOW_WIDTH)), math.max(1, glut.glutGet(GLUT_WINDOW_HEIGHT))
+	local w, h = max(1, glutGet(GLUT_WINDOW_WIDTH)), max(1, glutGet(GLUT_WINDOW_HEIGHT))
 	local width_of_3d_area = ({ [true] = w-bm.coronal_max_width, [false] = w })[drawing_thumbnails]
-	gl.glViewport(0, 0, width_of_3d_area-1, h-1)
+	glViewport(0, 0, width_of_3d_area-1, h-1)
 
 	-- Do transformations to implement the camera
-	gl.glMatrixMode(GL_PROJECTION)
-	gl.glLoadIdentity()
-	glu.gluPerspective(fovy_deg, width_of_3d_area/h, znear, zfar)
-	gl.glMatrixMode(GL_MODELVIEW)
-	gl.glLoadIdentity()
+	glMatrixMode(GL_PROJECTION)
+	glLoadIdentity()
+	gluPerspective(fovy_deg, width_of_3d_area/h, znear, zfar)
+	glMatrixMode(GL_MODELVIEW)
+	glLoadIdentity()
 	local x, y, z
 		= unpack(camera_offset)
 	z = z-camera_distance
-	gl.glTranslated(x, y, z)
-	gl.glRotated(x_angle_deg, -1.0, 0.0, 0.0)
-	gl.glRotated(y_angle_deg,  0.0, 1.0, 0.0)
+	glTranslated(x, y, z)
+	glRotated(x_angle_deg, -1.0, 0.0, 0.0)
+	glRotated(y_angle_deg,  0.0, 1.0, 0.0)
 	x, y, z = unpack(camera_pivot)
-	gl.glTranslated(-x, -y, -z)
+	glTranslated(-x, -y, -z)
 end
 
 on_display = function()
 	if(not(doing_transparency)) then
-		gl.glEnable(GL_DEPTH_TEST)
+		glEnable(GL_DEPTH_TEST)
 	end
-	gl.glClearColor(1.0, 1.0, 1.0, 1.0)
-	gl.glClear(bit32.bor(GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT))
+	glClearColor(1.0, 1.0, 1.0, 1.0)
+	glClear(bor(GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT))
 
 	set_up_3D_viewport_and_matrices()
 
-	gl.glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, unpack(mesh_color))
-	gl.glEnable(GL_LIGHTING)
-	gl.glPushMatrix()
+	glMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE, unpack(mesh_color))
+	glEnable(GL_LIGHTING)
+	glPushMatrix()
 	if(candy_striping) then
-		gl.glEnable(GL_TEXTURE_1D)
-		gl.glEnable(GL_TEXTURE_GEN_S)
+		glEnable(GL_TEXTURE_1D)
+		glEnable(GL_TEXTURE_GEN_S)
 	end
 	for _, mesh in pairs(meshes) do
 		mesh:draw()
 	end
 	if(candy_striping) then
-		gl.glDisable(GL_TEXTURE_1D)
-		gl.glDisable(GL_TEXTURE_GEN_S)
+		glDisable(GL_TEXTURE_1D)
+		glDisable(GL_TEXTURE_GEN_S)
 	end
-	gl.glPopMatrix()
-	gl.glDisable(GL_LIGHTING)
+	glPopMatrix()
+	glDisable(GL_LIGHTING)
 
-	gl.glColor(unpack(axes_color))
-	gl.glPushMatrix()
-	gl.glTranslated(center[1], center[2], center[3], 1)
-	gl.glScaled(edges[1], edges[2], edges[3])
-	glut.glutWireCube(1.0)
-	gl.glPopMatrix()
+	glColor(unpack(axes_color))
+	glPushMatrix()
+	glTranslated(center[1], center[2], center[3], 1)
+	glScaled(edges[1], edges[2], edges[3])
+	glutWireCube(1.0)
+	glPopMatrix()
 	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", scene_box[1], scene_box[2], scene_box[3]), scene_box[1], scene_box[2], scene_box[3])
 	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", scene_box[4], scene_box[5], scene_box[6]), scene_box[4], scene_box[5], scene_box[6])
 
@@ -275,7 +334,7 @@ on_display = function()
 		= get_mouse_location()
 	if(locked_position) then
 
-		gl.glDepthMask(false)
+		glDepthMask(false)
 
 		local box = {
 			scene_box[1]-5,
@@ -286,52 +345,52 @@ on_display = function()
 			scene_box[6]+5
 		}
 
-		gl.glBegin(GL_QUADS)
+		glBegin(GL_QUADS)
 
 		-- coronal
-		gl.glColor(unpack(coronal_plane_color))
-		gl.glVertex(box[1], box[2], z)
-		gl.glVertex(box[1], box[5], z)
-		gl.glVertex(box[4], box[5], z)
-		gl.glVertex(box[4], box[2], z)
+		glColor(unpack(coronal_plane_color))
+		glVertex(box[1], box[2], z)
+		glVertex(box[1], box[5], z)
+		glVertex(box[4], box[5], z)
+		glVertex(box[4], box[2], z)
 
 		-- horizontal
-		gl.glColor(unpack(horizontal_plane_color))
-		gl.glVertex(box[1], y, box[3])
-		gl.glVertex(box[1], y, box[6])
-		gl.glVertex(box[4], y, box[6])
-		gl.glVertex(box[4], y, box[3])
+		glColor(unpack(horizontal_plane_color))
+		glVertex(box[1], y, box[3])
+		glVertex(box[1], y, box[6])
+		glVertex(box[4], y, box[6])
+		glVertex(box[4], y, box[3])
 
 		-- sagittal
-		gl.glColor(unpack(sagittal_plane_color))
-		gl.glVertex(x, box[2], box[3])
-		gl.glVertex(x, box[2], box[6])
-		gl.glVertex(x, box[5], box[6])
-		gl.glVertex(x, box[5], box[3])
+		glColor(unpack(sagittal_plane_color))
+		glVertex(x, box[2], box[3])
+		glVertex(x, box[2], box[6])
+		glVertex(x, box[5], box[6])
+		glVertex(x, box[5], box[3])
 
-		gl.glEnd()
+		glEnd()
 
 		-- Draw lines where the planes of section intersect
-		gl.glBegin(GL_LINES)
-		gl.glColor(0.0, 0.0, 0.0, 1.0)	-- back to black
-		gl.glVertex(x, y, box[3])
-		gl.glVertex(x, y, box[6])
-		gl.glVertex(box[1], y, z)
-		gl.glVertex(box[4], y, z)
-		gl.glVertex(x, box[2], z)
-		gl.glVertex(x, box[5], z)
-		gl.glEnd()
-		gl.glDepthMask(true)
+		glBegin(GL_LINES)
+		glColor(0.0, 0.0, 0.0, 1.0)	-- back to black
+		glVertex(x, y, box[3])
+		glVertex(x, y, box[6])
+		glVertex(box[1], y, z)
+		glVertex(box[4], y, z)
+		glVertex(x, box[2], z)
+		glVertex(x, box[5], z)
+		glEnd()
+		glDepthMask(true)
 	end
 
-	gl.glDisable(GL_DEPTH_TEST)
-	gl.glPushMatrix()
-	gl.glLoadIdentity()
-	gl.glMatrixMode(GL_PROJECTION)
-	gl.glPushMatrix()
-	gl.glLoadIdentity()
-	local h = math.max(1, glut.glutGet(GLUT_WINDOW_HEIGHT))
-	gl.glOrtho(1, math.max(1, glut.glutGet(GLUT_WINDOW_WIDTH)), 1, h, -1, 1)
+	glDisable(GL_DEPTH_TEST)
+	glPushMatrix()
+	glLoadIdentity()
+	glMatrixMode(GL_PROJECTION)
+	glPushMatrix()
+	glLoadIdentity()
+	local h = max(1, glutGet(GLUT_WINDOW_HEIGHT))
+	glOrtho(1, max(1, glutGet(GLUT_WINDOW_WIDTH)), 1, h, -1, 1)
 	local str = nil
 	-- Only draw the 3D mouse coords if the mouse is probably over the
 	-- surface.  This hack on the next line should be replaced with something
@@ -341,37 +400,37 @@ on_display = function()
 	end
 
 	if(str) then
-		gl.glRasterPos(10, h-20)
+		glRasterPos(10, h-20)
 		draw_bitmap_string(GLUT_BITMAP_8_BY_13, str)
 	end
 
 	-- More here: print out other info of interest: frame rate, etc.
-	gl.glRasterPos(10, 10)
+	glRasterPos(10, 10)
 	if(kb_cmd_mode==1) then
 		draw_bitmap_string(GLUT_BITMAP_8_BY_13, "lua> " .. command .. "|")
 	end
-	gl.glPopMatrix()
-	gl.glMatrixMode(GL_MODELVIEW)
-	gl.glPopMatrix()
-	if(gl.glGetDoublev(GL_DEPTH_TEST)==1) then
-		gl.glEnable(GL_DEPTH_TEST)
+	glPopMatrix()
+	glMatrixMode(GL_MODELVIEW)
+	glPopMatrix()
+	if(glGetDoublev(GL_DEPTH_TEST)==1) then
+		glEnable(GL_DEPTH_TEST)
 	end
 
 	if(#labels>0) then
-		gl.glColor(unpack(label_color))
+		glColor(unpack(label_color))
 		for _, L in pairs(labels) do
 			x, y, z, s = unpack(L)
 			draw_bitmap_string(GLUT_BITMAP_HELVETICA_12, s, x, y, z)
 		end
-		gl.glPointSize(label_point_size)
-		gl.glBegin(GL_POINTS)
+		glPointSize(label_point_size)
+		glBegin(GL_POINTS)
 		for _, L in pairs(labels) do
 			x, y, z, s = unpack(L)
-			gl.glVertex(x, y, z)
+			glVertex(x, y, z)
 		end
-		gl.glEnd()
-		gl.glPointSize(1)
-		gl.glColor(0.0, 0.0, 0.0, 1.0)
+		glEnd()
+		glPointSize(1)
+		glColor(0.0, 0.0, 0.0, 1.0)
 	end
 	if(drawing_thumbnails) then
 		-- These have to be done while we still have the GL
@@ -379,37 +438,37 @@ on_display = function()
 		local icor, ihor, isag
 			= get_coronal_index_from_mouse(), get_horizontal_index_from_mouse(), get_sagittal_index_from_mouse()
 
-		local w = math.max(1, glut.glutGet(GLUT_WINDOW_WIDTH))
+		local w = max(1, glutGet(GLUT_WINDOW_WIDTH))
 		local wt = bm.coronal_max_width
-		gl.glViewport(w-wt-10, 0, wt+10, h)
-		gl.glDisable(GL_DEPTH_TEST)
+		glViewport(w-wt-10, 0, wt+10, h)
+		glDisable(GL_DEPTH_TEST)
 
-		gl.glMatrixMode(GL_PROJECTION)
-		gl.glLoadIdentity()
-		gl.glOrtho(1, wt, 1, h, 0, 1)
-		gl.glMatrixMode(GL_MODELVIEW)
-		gl.glLoadIdentity()
+		glMatrixMode(GL_PROJECTION)
+		glLoadIdentity()
+		glOrtho(1, wt, 1, h, 0, 1)
+		glMatrixMode(GL_MODELVIEW)
+		glLoadIdentity()
 
 		-- Figure out which section to draw, based on where the mouse is
 		-- pointing in 3D.
-		gl.glPixelZoom(1.0, -1.0)	-- GL draws images upside down by default.
+		glPixelZoom(1.0, -1.0)	-- GL draws images upside down by default.
 
 		-- Draw a white square behind all the images
-		gl.glColor(1, 1, 1)
+		glColor(1, 1, 1)
 		local x0, y0, x1, y1
 			= 1, 1, bm.coronal_max_width, h
-		gl.glBegin(GL_QUADS)
-		gl.glVertex(x0, y0)
-		gl.glVertex(x1, y0)
-		gl.glVertex(x1, y1)
-		gl.glVertex(x0, y1)
-		gl.glEnd()
-		gl.glColor(0, 0, 0)
+		glBegin(GL_QUADS)
+		glVertex(x0, y0)
+		glVertex(x1, y0)
+		glVertex(x1, y1)
+		glVertex(x0, y1)
+		glEnd()
+		glColor(0, 0, 0)
 
 		local cor_img = bm.coronal_thumbnails[icor]
 		h = h-1
 		if(cor_img) then
-			gl.glRasterPos(1, h)
+			glRasterPos(1, h)
 			cor_img:draw_pixels()
 		end
 
@@ -417,30 +476,30 @@ on_display = function()
 
 		local sag_img = bm.sagittal_thumbnails[isag]
 		if(sag_img) then
-			gl.glRasterPos(1, h)
+			glRasterPos(1, h)
 			sag_img:draw_pixels()
 		end
 		h = h-bm.sagittal_max_height-1
 
 		local hor_img = bm.horizontal_thumbnails[ihor]
 		if(hor_img) then
-			gl.glRasterPos(1, h)
+			glRasterPos(1, h)
 			hor_img:draw_pixels()
 		end
 
 		set_up_3D_viewport_and_matrices()	-- put it back so we can calc mouse coords
 	end
-	gl.glFlush()
-	glut.glutSwapBuffers()
+	glFlush()
+	glutSwapBuffers()
 end
 
-glut.glutReshapeWindow(glut.glutGet(GLUT_SCREEN_WIDTH), glut.glutGet(GLUT_SCREEN_HEIGHT))
+glutReshapeWindow(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT))
 
 -- It's not really zooming but moving the camera toward or away from the
 -- object being viewed.
 
 local zoom_to_fit = function()
-	camera_distance = math.sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/math.sin(fovy_deg*math.pi/360.0)/2.0
+	camera_distance = sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/sin(fovy_deg*math.pi/360.0)/2.0
 	camera_pivot = center
 end
 
@@ -498,10 +557,10 @@ local toggle_transparency = function()
 	doing_transparency = not(doing_transparency)
 	if(doing_transparency) then
 		mesh_color[4] = 0.5
-		gl.glDisable(GL_DEPTH_TEST)
+		glDisable(GL_DEPTH_TEST)
 	else
 		mesh_color[4] = 1.0
-		gl.glEnable(GL_DEPTH_TEST)
+		glEnable(GL_DEPTH_TEST)
 	end
 end
 
@@ -513,7 +572,7 @@ local zoom_in = function()
 		= camera_distance/4.0, camera_distance
 	local x1, y1, z1 = get_mouse_location()
 
-	if(math.max(math.abs(x1), math.abs(y1), math.abs(z1))<1e4) then
+	if(max(math.abs(x1), math.abs(y1), math.abs(z1))<1e4) then
 		local x0, y0, z0 = unpack(camera_pivot)
 		local cam_off0, start
 			= camera_offset, os.clock()
@@ -556,14 +615,14 @@ local make_stripe_fun = function(x, y, z, a)
 		local stripe_texture = {}
 		for i = 0, 3 do
 			for j = 1, 4 do
-				stripe_texture[bit32.arshift(i, -2)+j] = stripe_color[j]
+				stripe_texture[arshift(i, -2)+j] = stripe_color[j]
 			end
 		end
 		for i = 4, 127 do
 			for j = 1, 3 do
-				stripe_texture[bit32.arshift(i, -2)+j] = mesh_color[j]
+				stripe_texture[arshift(i, -2)+j] = mesh_color[j]
 			end
-			stripe_texture[bit32.arshift(i, -2)+4] = 1.0		-- opaque
+			stripe_texture[arshift(i, -2)+4] = 1.0		-- opaque
 		end
 
 		gl.glBindTexture(GL_TEXTURE_1D, gl.glGenTextures(1))
@@ -589,9 +648,9 @@ local cycle_through_draw_styles = (function()
 	return function()
 		draw_mode = draw_mode_switch[draw_mode]
 		if(draw_mode==GL_LINE) then
-			gl.glDisable(GL_LINE_SMOOTH)
+			glDisable(GL_LINE_SMOOTH)
 		else
-			gl.glEnable(GL_LINE_SMOOTH)
+			glEnable(GL_LINE_SMOOTH)
 		end
 		gl.glPolygonMode(GL_FRONT_AND_BACK, draw_mode)
 	end
@@ -607,10 +666,10 @@ local toggle_full_screen =  (function()
 		= 0, 0
 	return function()
 		if(fullscreen) then
-			glut.glutReshapeWindow(last_width, last_height)
+			glutReshapeWindow(last_width, last_height)
 		else
-			last_width, last_height = math.max(1, glut.glutGet(GLUT_WINDOW_WIDTH)), math.max(1, glut.glutGet(GLUT_WINDOW_HEIGHT))
-			glut.glutFullScreen()
+			last_width, last_height = max(1, glutGet(GLUT_WINDOW_WIDTH)), max(1, glutGet(GLUT_WINDOW_HEIGHT))
+			glutFullScreen()
 		end
 		fullscreen = not(fullscreen)
 	end
@@ -636,7 +695,7 @@ end
 
 local load_labels = function()
 	print "load_labels"
-	local file, err = io.open("labels.txt")
+	local file, err = open("labels.txt")
 	if(err) then
 		print "== Result of wget request =="
 		os.execute("wget http://brainmaps.org/labels.txt")
@@ -650,7 +709,7 @@ local calc_camera_coords = function()
 	local theta, phi
 		= -y_angle_deg/180.0*math.pi, -x_angle_deg/180.0*math.pi
 	local cx, cy, cz = unpack(camera_pivot)
-	return cx+camera_distance*math.sin(theta)*math.cos(phi), cy+camera_distance*math.sin(phi), cz+camera_distance*math.cos(theta)*math.cos(phi)
+	return cx+camera_distance*sin(theta)*cos(phi), cy+camera_distance*sin(phi), cz+camera_distance*cos(theta)*cos(phi)
 end
 
 local add_mouse_label = function()
@@ -687,8 +746,8 @@ bm.add_menu_item("Restart (r)", restart)
 bm.add_menu_item("Quit (q)", quit)
 
 on_mouse = function(button, state, xi, yi)
-	shift_is_pressed = bit32.band(glut.glutGetModifiers(), GLUT_ACTIVE_SHIFT)~=0
-	ctrl_is_pressed = bit32.band(glut.glutGetModifiers(), GLUT_ACTIVE_CTRL)~=0
+	shift_is_pressed = bit32.band(glutGetModifiers(), GLUT_ACTIVE_SHIFT)~=0
+	ctrl_is_pressed = bit32.band(glutGetModifiers(), GLUT_ACTIVE_CTRL)~=0
 	if(state==GLUT_DOWN) then
 		if(button==GLUT_LEFT) then
 			mouse_xi, mouse_yi = xi, yi
@@ -701,14 +760,14 @@ on_motion = function(xi, yi)
 		-- move camera closer in or further out
 		camera_distance = camera_distance/math.exp(0.01*(yi-mouse_yi))
 	elseif(ctrl_is_pressed) then
-		local h = math.max(1, glut.glutGet(GLUT_WINDOW_HEIGHT))
+		local h = max(1, glutGet(GLUT_WINDOW_HEIGHT))
 		-- z=0 at near clipping plane (http://www.opengl.org/resources/faq/technical/glu.htm)
 		local z = camera_distance/(zfar-znear)
-		gl.glPushMatrix()
-		gl.glLoadIdentity()
-		local pprev = {glu.gluUnProject(mouse_xi, h-mouse_yi-1, z)}
-		local p	= {glu.gluUnProject(xi, h-yi-1, z)}
-		gl.glPopMatrix()
+		glPushMatrix()
+		glLoadIdentity()
+		local pprev = {gluUnProject(mouse_xi, h-mouse_yi-1, z)}
+		local p	= {gluUnProject(xi, h-yi-1, z)}
+		glPopMatrix()
 		for i = 1, 3 do
 			camera_offset[i] = camera_offset[i]+edges[i]*(p[i]-pprev[i])
 		end
@@ -719,12 +778,12 @@ on_motion = function(xi, yi)
 	mouse_xi = xi
 	mouse_yi = yi
 
-	glut.glutPostRedisplay()
+	glutPostRedisplay()
 end
 
 on_passive_motion = function(xi, yi)
 	mouse_xi, mouse_yi = xi, yi;
-	glut.glutPostRedisplay()
+	glutPostRedisplay()
 end
 
 on_keyboard = (function()
@@ -797,9 +856,9 @@ on_keyboard = (function()
 			local f = key_bindings[string.char(key)]
 			if(f) then
 				f(xi, yi)
-				glut.glutPostRedisplay()
+				glutPostRedisplay()
 			end
 		end
-		glut.glutPostRedisplay()
+		glutPostRedisplay()
 	end
 end)()
