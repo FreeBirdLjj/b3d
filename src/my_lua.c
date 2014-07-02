@@ -106,7 +106,7 @@ static const struct luaL_Reg bmlib[] = {
 };
 
 int l_open_bmlib(lua_State *L){
-	luaL_openlib(L, "bm", bmlib, 0);
+	luaL_newlib(L, bmlib);
 	return 1;
 }
 
@@ -144,8 +144,8 @@ void brainmaps_start_lua(void){
 	const luaL_Reg *lib;
 	for(lib = lualibs; lib->func; lib++){
 		fprintf(stderr, "Loading lua lib: %s\n", lib->name);
-		lib->func(lua_state);		/* open library */
-		lua_settop(lua_state, 0);	/* discard any results */
+		luaL_requiref(lua_state, lib->name, lib->func, 1);	/* open library */
+		lua_pop(lua_state, 1);	/* discard any results */
 	}
 
 	l_reset_menu(lua_state);

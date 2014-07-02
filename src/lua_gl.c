@@ -57,19 +57,6 @@
 #include <stdlib.h>
 
 /* untested. -ijt */
-GLfloat *float_array_from_table_in_final_arg(lua_State *L, int *n){
-	int i;
-	*n = luaL_getn(L, -1);
-	GLfloat *ret = malloc((*n)*sizeof(ret[0])); 
-	for(i = 0; i<*n; i++){
-		lua_pushnumber(L, i+1);
-		lua_gettable(L, -2);
-		ret[i] = luaL_checknumber(L, -1);
-		lua_pop(L, 1);
-	}
-	return ret;
-}
-
 BIND_0_1(glBegin, int);
 BIND_0_0(glEnd)
 
@@ -318,6 +305,19 @@ int luaL_getn(lua_State *L, int t){
 	}
 	lua_pop(L, 1);
 	return n-1;
+}
+
+GLfloat *float_array_from_table_in_final_arg(lua_State *L, int *n){
+	int i;
+	*n = luaL_getn(L, -1);
+	GLfloat *ret = malloc((*n)*sizeof(ret[0])); 
+	for(i = 0; i<*n; i++){
+		lua_pushnumber(L, i+1);
+		lua_gettable(L, -2);
+		ret[i] = luaL_checknumber(L, -1);
+		lua_pop(L, 1);
+	}
+	return ret;
 }
 
 /* Need to test this... -ijt */
@@ -784,7 +784,7 @@ static const struct luaL_Reg gl_lib[] = {
 
 
 int luaopen_gl(lua_State *L){
-	luaL_openlib(L, "gl", gl_lib, 0);
+	luaL_newlib(L, gl_lib);
 	return 1;
 }
 

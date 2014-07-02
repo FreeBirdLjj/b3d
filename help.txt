@@ -1,0 +1,26 @@
+                               b3d help
+
+To rotate the brain, just click and drag.  To move the camera closer
+to the brain, hold the shift key and drag downwards.  To move farther
+away, hold shift and drag upwards.  To pan, click and drag while
+pressing the 'Ctrl' key.
+
+When the mouse pointer is moved over the brain surface, the
+coordinates of the surface point are displayed at the upper left
+corner of the window.
+
+Thumbnail images are displayed for brain sections that correspond to
+where the mouse is pointing.
+
+Contour curves can be displayed on the brain surface perpendicular to
+the X, Y, or Z axis.  To display curves perpendicular to the X axis,
+click the viewing area with the right mouse button and select `X
+Stripes' from the menu that appears.  The others are similar.  Since
+the stripes are thin, it may be necessary to move the camera closer to
+the brain to see them clearly.
+
+To view a high-resolution section on brainmaps.org, select `Browse
+coronal', `Browse horizontal', `Browse sagittal', or `Browse all
+three' from the context menu.  On most systems, this menu can be found
+by clicking the right mouse button.
+
