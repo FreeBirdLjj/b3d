@@ -5,6 +5,8 @@
 *.l[ao]
 *.out
 *.tar.xz
+*.Po
+*.Plo
 tags
 jpeg-9a/config.log
 jpeg-9a/config.status

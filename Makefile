@@ -1,4 +1,3 @@
-BIN = bin/b3d
 JPEG_VER = 9a
 LIBJPEG_DIR = jpeg-$(JPEG_VER)
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
@@ -7,8 +6,10 @@ LIBLUA_DIR = lua-$(LIBLUA_VER)
 LIBLUA = $(LIBLUA_DIR)/src/liblua.a
 
 CPPFLAGS = -DDEBUG -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR)
-CFLAGS = -g -O4 `llvm-config --cflags`
+CFLAGS = -g -O3
 LDLIBS = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs -llua -lm -ljpeg -lglut -lGL -lGLU -ldl
+
+BIN = bin/b3d
 
 .PHONY: all
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
