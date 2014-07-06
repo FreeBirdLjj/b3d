@@ -171,7 +171,7 @@ local draw_mode = GL_FILL
 local showing_planes = nil
 local locked_position = nil
 local scene_box = {}
-local kb_cmd_mode = 0
+local kb_cmd_mode = false
 
 local command = ""				-- command being entered by the user
 local candy_striping, doing_transparency, drawing_thumbnails, ctrl_is_pressed, shift_is_pressed
@@ -249,19 +249,11 @@ end
 local center = { (scene_box[1]+scene_box[4])/2, (scene_box[2]+scene_box[5])/2, (scene_box[3]+scene_box[6])/2 }
 local edges = { scene_box[4]-scene_box[1], scene_box[5]-scene_box[2], scene_box[6]-scene_box[3] }
 
-local get_coronal_index_from_mouse = function()
+local get_indexes_from_mouse = function()
 	local x, y, z = get_mouse_location()
-	return floor((#bm.coronal_names)*(z-scene_box[3])/edges[3])
-end
-
-local get_horizontal_index_from_mouse = function()
-	local x, y, z = get_mouse_location()
-	return floor((#bm.horizontal_names)*(y-scene_box[2])/edges[2])
-end
-
-local get_sagittal_index_from_mouse = function()
-	local x, y, z = get_mouse_location()
-	return floor((#bm.sagittal_names)*(x-scene_box[1])/edges[1])
+	return floor((#bm.coronal_names)*(z-scene_box[3])/edges[3]),
+	       floor((#bm.horizontal_names)*(y-scene_box[2])/edges[2]),
+	       floor((#bm.sagittal_names)*(x-scene_box[1])/edges[1])
 end
 
 -------
@@ -343,8 +335,7 @@ on_display = function()
 	show_pos(scene_box[1], scene_box[2], scene_box[3])
 	show_pos(scene_box[4], scene_box[5], scene_box[6])
 
-	local x, y, z
-		= get_mouse_location()
+	local x, y, z = get_mouse_location()
 
 	if(locked_position) then
 
@@ -394,8 +385,9 @@ on_display = function()
 	glMatrixMode(GL_PROJECTION)
 	glPushMatrix()
 	glLoadIdentity()
-	local h = max(1, glutGet(GLUT_WINDOW_HEIGHT))
-	glOrtho(1, max(1, glutGet(GLUT_WINDOW_WIDTH)), 1, h, -1, 1)
+	local w, h
+		= max(1, glutGet(GLUT_WINDOW_WIDTH)), max(1, glutGet(GLUT_WINDOW_HEIGHT))
+	glOrtho(1, w, 1, h, -1, 1)
 	local str = nil
 	-- Only draw the 3D mouse coords if the mouse is probably over the
 	-- surface.  This hack on the next line should be replaced with something
@@ -411,39 +403,44 @@ on_display = function()
 
 	-- More here: print out other info of interest: frame rate, etc.
 	glRasterPos(10, 10)
-	if(kb_cmd_mode==1) then
+	if(kb_cmd_mode) then
 		draw_bitmap_string("8x13", "lua> " .. command .. "|")
 	end
 	glPopMatrix()
 	glMatrixMode(GL_MODELVIEW)
 	glPopMatrix()
+
 	if(glGetDoublev(GL_DEPTH_TEST)==1) then
 		glEnable(GL_DEPTH_TEST)
 	end
 
 	if(#labels>0) then
 		glColor(unpack(label_color))
+
 		for _, L in pairs(labels) do
 			x, y, z, s = unpack(L)
 			draw_bitmap_string(GLUT_BITMAP_HELVETICA_12, s, x, y, z)
 		end
+
 		glPointSize(label_point_size)
+
 		glBegin(GL_POINTS)
 		for _, L in pairs(labels) do
 			x, y, z, s = unpack(L)
 			glVertex(x, y, z)
 		end
 		glEnd()
+
 		glPointSize(1)
 		glColor(0.0, 0.0, 0.0, 1.0)
 	end
+
 	if(drawing_thumbnails) then
 		-- These have to be done while we still have the GL
 		-- matrices and viewport set up from the 3D drawing.
 		local icor, ihor, isag
-			= get_coronal_index_from_mouse(), get_horizontal_index_from_mouse(), get_sagittal_index_from_mouse()
+			= get_indexes_from_mouse()
 
-		local w = max(1, glutGet(GLUT_WINDOW_WIDTH))
 		local wt = bm.coronal_max_width
 		glViewport(w-wt-10, 0, wt+10, h)
 		glDisable(GL_DEPTH_TEST)
@@ -531,21 +528,24 @@ local run_user_selected_lua_script = function()
 end
 
 local browse_coronal = function()
-	local name = bm.coronal_names[get_coronal_index_from_mouse()]
+	local icor, ihor, isag = get_indexes_from_mouse()
+	local name = bm.coronal_names[icor]
 	if(name) then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH04/RH04a/&file=HBP/m.mulatta/RH04/RH04a/" .. name .. "/&win=max\"")
 	end
 end
 
 local browse_horizontal = function()
-	local name = bm.horizontal_names[get_horizontal_index_from_mouse()]
+	local icor, ihor, isag = get_indexes_from_mouse()
+	local name = bm.horizontal_names[ihor]
 	if(name) then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH10/RH10a/&file=HBP/m.mulatta/RH10/RH10a/" .. name .. "/&win=max\"")
 	end
 end
 
 local browse_sagittal = function()
-	local name = bm.sagittal_names[get_sagittal_index_from_mouse]
+	local icor, ihor, isag = get_indexes_from_mouse()
+	local name = bm.sagittal_names[isag]
 	if(name) then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH12/RH12a/&file=HBP/m.mulatta/RH12/RH12a/" .. name .. "/&win=max\"")
 	end
@@ -671,13 +671,13 @@ local toggle_full_screen =  (function()
 	local last_width, last_height
 		= 0, 0
 	return function()
+		fullscreen = not(fullscreen)
 		if(fullscreen) then
-			glutReshapeWindow(last_width, last_height)
-		else
 			last_width, last_height = max(1, glutGet(GLUT_WINDOW_WIDTH)), max(1, glutGet(GLUT_WINDOW_HEIGHT))
 			glutFullScreen()
+		else
+			glutReshapeWindow(last_width, last_height)
 		end
-		fullscreen = not(fullscreen)
 	end
 end)()
 
@@ -692,11 +692,11 @@ end
 -- Global function add_label() for executing labels.txt
 add_label = function(x, y, z, text)
 	print(string.format("adding label: %3.3f %3.3f %3.3f %s", x, y, z, text))
-	labels[#labels+1] = {x, y, z, text}
+	table.insert(labels, {x, y, z, text})
 end
 
 local begin_command_mode = function()
-	kb_cmd_mode = 1
+	kb_cmd_mode = true
 end
 
 local load_labels = function()
@@ -715,7 +715,7 @@ local calc_camera_coords = function()
 	local theta, phi
 		= -y_angle_deg/180.0*pi, -x_angle_deg/180.0*pi
 	local cx, cy, cz = unpack(camera_pivot)
-	return cx+camera_distance*sin(theta)*cos(phi), cy+camera_distance*sin(phi), cz+camera_distance*cos(theta)*cos(phi)
+	return cx+camera_distance*cos(phi)*sin(theta), cy+camera_distance*sin(phi), cz+camera_distance*cos(phi)*cos(theta)
 end
 
 local add_mouse_label = function()
@@ -827,7 +827,7 @@ local key_bindings = {
 }
 
 on_keyboard = function(key, xi, yi)
-	if(kb_cmd_mode==1) then
+	if(kb_cmd_mode) then
 		-- If it's Enter, then try to execute the command.
 		if(key==13) then
 			local loaded_cmd = loadstring(command)
@@ -853,7 +853,7 @@ on_keyboard = function(key, xi, yi)
 
 		-- If it's Esc or ctrl-c, then abort the command
 		elseif(key==27 or key==3) then
-			kb_cmd_mode = 0
+			kb_cmd_mode = false
 			command = ""
 		else
 			-- Otherwise, add the character to the command.
