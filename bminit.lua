@@ -13,9 +13,14 @@ local bm = bm
 
 -- Functions
 local arshift = bit32.arshift
+local abs = math.abs
+
+local band = bit32.band
 local bor = bit32.bor
 
 local cos = math.cos
+
+local exp = math.exp
 
 local floor = math.floor
 
@@ -63,6 +68,8 @@ local max = math.max
 local min = math.min
 
 local open = io.open
+
+local pi = math.pi
 
 local sin = math.sin
 local sqrt = math.sqrt
@@ -498,7 +505,7 @@ glutReshapeWindow(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT))
 -- object being viewed.
 
 local zoom_to_fit = function()
-	camera_distance = sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/sin(fovy_deg*math.pi/360.0)/2.0
+	camera_distance = sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/sin(fovy_deg*pi/360.0)/2.0
 	camera_pivot = center
 end
 
@@ -571,7 +578,7 @@ local zoom_in = function()
 		= camera_distance/4.0, camera_distance
 	local x1, y1, z1 = get_mouse_location()
 
-	if(max(math.abs(x1), math.abs(y1), math.abs(z1))<1e4) then
+	if(max(abs(x1), abs(y1), abs(z1))<1e4) then
 		local x0, y0, z0 = unpack(camera_pivot)
 		local cam_off0, start
 			= camera_offset, os.clock()
@@ -706,7 +713,7 @@ end
 
 local calc_camera_coords = function()
 	local theta, phi
-		= -y_angle_deg/180.0*math.pi, -x_angle_deg/180.0*math.pi
+		= -y_angle_deg/180.0*pi, -x_angle_deg/180.0*pi
 	local cx, cy, cz = unpack(camera_pivot)
 	return cx+camera_distance*sin(theta)*cos(phi), cy+camera_distance*sin(phi), cz+camera_distance*cos(theta)*cos(phi)
 end
@@ -745,8 +752,8 @@ bm.add_menu_item("Restart (r)", restart)
 bm.add_menu_item("Quit (q)", quit)
 
 on_mouse = function(button, state, xi, yi)
-	shift_is_pressed = bit32.band(glutGetModifiers(), GLUT_ACTIVE_SHIFT)~=0
-	ctrl_is_pressed = bit32.band(glutGetModifiers(), GLUT_ACTIVE_CTRL)~=0
+	shift_is_pressed = band(glutGetModifiers(), GLUT_ACTIVE_SHIFT)~=0
+	ctrl_is_pressed = band(glutGetModifiers(), GLUT_ACTIVE_CTRL)~=0
 	if(state==GLUT_DOWN) then
 		if(button==GLUT_LEFT) then
 			mouse_xi, mouse_yi = xi, yi
@@ -757,7 +764,7 @@ end
 on_motion = function(xi, yi)
 	if(shift_is_pressed) then
 		-- move camera closer in or further out
-		camera_distance = camera_distance/math.exp(0.01*(yi-mouse_yi))
+		camera_distance = camera_distance/exp(0.01*(yi-mouse_yi))
 	elseif(ctrl_is_pressed) then
 		local h = max(1, glutGet(GLUT_WINDOW_HEIGHT))
 		-- z=0 at near clipping plane (http://www.opengl.org/resources/faq/technical/glu.htm)
