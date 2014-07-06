@@ -12,6 +12,7 @@ local os = os
 local bm = bm
 
 -- Functions
+local arshift = bit32.arshift
 local bor = bit32.bor
 
 local cos = math.cos
@@ -56,8 +57,6 @@ local glutSwapBuffers = glut.glutSwapBuffers
 local glutWireCube = glut.glutWireCube
 
 local load = image.load
-
-local arshift = bit32.arshift
 
 local max = math.max
 local min = math.min
@@ -275,6 +274,10 @@ local draw_bitmap_string = function(font, s, x, y, z)
 	end
 end
 
+local show_pos = function(x, y, z)
+	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", x, y, z), x, y, z)
+end
+
 local set_up_3D_viewport_and_matrices = function()
 	local w, h = max(1, glutGet(GLUT_WINDOW_WIDTH)), max(1, glutGet(GLUT_WINDOW_HEIGHT))
 	local width_of_3d_area = ({ [true] = w-bm.coronal_max_width, [false] = w })[drawing_thumbnails]
@@ -328,11 +331,12 @@ on_display = function()
 	glScaled(edges[1], edges[2], edges[3])
 	glutWireCube(1.0)
 	glPopMatrix()
-	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", scene_box[1], scene_box[2], scene_box[3]), scene_box[1], scene_box[2], scene_box[3])
-	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", scene_box[4], scene_box[5], scene_box[6]), scene_box[4], scene_box[5], scene_box[6])
+	show_pos(scene_box[1], scene_box[2], scene_box[3])
+	show_pos(scene_box[4], scene_box[5], scene_box[6])
 
 	local x, y, z
 		= get_mouse_location()
+
 	if(locked_position) then
 
 		glDepthMask(false)
