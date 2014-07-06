@@ -249,19 +249,11 @@ end
 local center = { (scene_box[1]+scene_box[4])/2, (scene_box[2]+scene_box[5])/2, (scene_box[3]+scene_box[6])/2 }
 local edges = { scene_box[4]-scene_box[1], scene_box[5]-scene_box[2], scene_box[6]-scene_box[3] }
 
-local get_coronal_index_from_mouse = function()
+local get_indexes_from_mouse = function()
 	local x, y, z = get_mouse_location()
-	return floor((#bm.coronal_names)*(z-scene_box[3])/edges[3])
-end
-
-local get_horizontal_index_from_mouse = function()
-	local x, y, z = get_mouse_location()
-	return floor((#bm.horizontal_names)*(y-scene_box[2])/edges[2])
-end
-
-local get_sagittal_index_from_mouse = function()
-	local x, y, z = get_mouse_location()
-	return floor((#bm.sagittal_names)*(x-scene_box[1])/edges[1])
+	return floor((#bm.coronal_names)*(z-scene_box[3])/edges[3]),
+	       floor((#bm.horizontal_names)*(y-scene_box[2])/edges[2]),
+	       floor((#bm.sagittal_names)*(y-scene_box[2])/edges[2])
 end
 
 -------
@@ -441,7 +433,7 @@ on_display = function()
 		-- These have to be done while we still have the GL
 		-- matrices and viewport set up from the 3D drawing.
 		local icor, ihor, isag
-			= get_coronal_index_from_mouse(), get_horizontal_index_from_mouse(), get_sagittal_index_from_mouse()
+			= get_indexes_from_mouse()
 
 		local w = max(1, glutGet(GLUT_WINDOW_WIDTH))
 		local wt = bm.coronal_max_width
@@ -531,21 +523,27 @@ local run_user_selected_lua_script = function()
 end
 
 local browse_coronal = function()
-	local name = bm.coronal_names[get_coronal_index_from_mouse()]
+	local icor, ihor, isag
+		= get_indexes_from_mouse()
+	local name = bm.coronal_names[icor]
 	if(name) then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH04/RH04a/&file=HBP/m.mulatta/RH04/RH04a/" .. name .. "/&win=max\"")
 	end
 end
 
 local browse_horizontal = function()
-	local name = bm.horizontal_names[get_horizontal_index_from_mouse()]
+	local icor, ihor, isag
+		= get_indexes_from_mouse()
+	local name = bm.horizontal_names[ihor]
 	if(name) then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH10/RH10a/&file=HBP/m.mulatta/RH10/RH10a/" .. name .. "/&win=max\"")
 	end
 end
 
 local browse_sagittal = function()
-	local name = bm.sagittal_names[get_sagittal_index_from_mouse]
+	local icor, ihor, isag
+		= get_indexes_from_mouse()
+	local name = bm.sagittal_names[isag]
 	if(name) then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH12/RH12a/&file=HBP/m.mulatta/RH12/RH12a/" .. name .. "/&win=max\"")
 	end
