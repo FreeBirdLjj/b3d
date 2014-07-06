@@ -51,6 +51,7 @@ local gluUnProject = glu.gluUnProject
 local glutBitmapCharacter = glut.glutBitmapCharacter
 local glutFullScreen = glut.glutFullScreen
 local glutGet = glut.glutGet
+local glutGetModifiers = glut.glutGetModifiers
 local glutPostRedisplay = glut.glutPostRedisplay
 local glutReshapeWindow = glut.glutReshapeWindow
 local glutSwapBuffers = glut.glutSwapBuffers
@@ -135,11 +136,6 @@ local GL_COLOR_BUFFER_BIT	= 0x00004000
 local GLUT_DOWN			= 0
 local GLUT_UP			= 1
 local GLUT_LEFT			= 0
-local GLUT_BITMAP_9_BY_15	= "GLUT_BITMAP_9_BY_15"
-local GLUT_BITMAP_8_BY_13	= "GLUT_BITMAP_8_BY_13"
-local GLUT_BITMAP_HELVETICA_10	= "GLUT_BITMAP_HELVETICA_10"
-local GLUT_BITMAP_HELVETICA_12	= "GLUT_BITMAP_HELVETICA_12"
-local GLUT_BITMAP_HELVETICA_18	= "GLUT_BITMAP_HELVETICA_18"
 local GLUT_WINDOW_X		= 100
 local GLUT_WINDOW_Y		= 101
 local GLUT_WINDOW_WIDTH		= 102
@@ -267,7 +263,13 @@ end
 
 local draw_bitmap_string = function(font, s, x, y, z)
 	if(x) then
-		glRasterPos(x, y, z)
+		if(z) then
+			glRasterPos(x, y, z)
+		else
+			glDepthMask(false)
+			glRasterPos(x, y)
+			glDepthMask(true)
+		end
 	end
 	for i = 1, string.len(s) do
 		glutBitmapCharacter(font, string.byte(s, i))
@@ -341,49 +343,40 @@ on_display = function()
 
 		glDepthMask(false)
 
-		local box = {
-			scene_box[1]-5,
-			scene_box[2]-5,
-			scene_box[3]-5,
-			scene_box[4]+5,
-			scene_box[5]+5,
-			scene_box[6]+5
-		}
-
 		glBegin(GL_QUADS)
 
 		-- coronal
 		glColor(unpack(coronal_plane_color))
-		glVertex(box[1], box[2], z)
-		glVertex(box[1], box[5], z)
-		glVertex(box[4], box[5], z)
-		glVertex(box[4], box[2], z)
+		glVertex(scene_box[1], scene_box[2], z)
+		glVertex(scene_box[1], scene_box[5], z)
+		glVertex(scene_box[4], scene_box[5], z)
+		glVertex(scene_box[4], scene_box[2], z)
 
 		-- horizontal
 		glColor(unpack(horizontal_plane_color))
-		glVertex(box[1], y, box[3])
-		glVertex(box[1], y, box[6])
-		glVertex(box[4], y, box[6])
-		glVertex(box[4], y, box[3])
+		glVertex(scene_box[1], y, scene_box[3])
+		glVertex(scene_box[1], y, scene_box[6])
+		glVertex(scene_box[4], y, scene_box[6])
+		glVertex(scene_box[4], y, scene_box[3])
 
 		-- sagittal
 		glColor(unpack(sagittal_plane_color))
-		glVertex(x, box[2], box[3])
-		glVertex(x, box[2], box[6])
-		glVertex(x, box[5], box[6])
-		glVertex(x, box[5], box[3])
+		glVertex(x, scene_box[2], scene_box[3])
+		glVertex(x, scene_box[2], scene_box[6])
+		glVertex(x, scene_box[5], scene_box[6])
+		glVertex(x, scene_box[5], scene_box[3])
 
 		glEnd()
 
 		-- Draw lines where the planes of section intersect
 		glBegin(GL_LINES)
 		glColor(0.0, 0.0, 0.0, 1.0)	-- back to black
-		glVertex(x, y, box[3])
-		glVertex(x, y, box[6])
-		glVertex(box[1], y, z)
-		glVertex(box[4], y, z)
-		glVertex(x, box[2], z)
-		glVertex(x, box[5], z)
+		glVertex(x, y, scene_box[3])
+		glVertex(x, y, scene_box[6])
+		glVertex(scene_box[1], y, z)
+		glVertex(scene_box[4], y, z)
+		glVertex(x, scene_box[2], z)
+		glVertex(x, scene_box[5], z)
 		glEnd()
 		glDepthMask(true)
 	end
@@ -401,18 +394,18 @@ on_display = function()
 	-- surface.  This hack on the next line should be replaced with something
 	-- smarter.
 	if(x^2+y^2+z^2<(0.75*zfar)^2) then
-		str = string.format("%4.3f %4.3f %4.3f", x, y, z)
+		str = string.format("Mouse location: (%4.3f, %4.3f, %4.3f)", x, y, z)
 	end
 
 	if(str) then
 		glRasterPos(10, h-20)
-		draw_bitmap_string(GLUT_BITMAP_8_BY_13, str)
+		draw_bitmap_string("8x13", str)
 	end
 
 	-- More here: print out other info of interest: frame rate, etc.
 	glRasterPos(10, 10)
 	if(kb_cmd_mode==1) then
-		draw_bitmap_string(GLUT_BITMAP_8_BY_13, "lua> " .. command .. "|")
+		draw_bitmap_string("8x13", "lua> " .. command .. "|")
 	end
 	glPopMatrix()
 	glMatrixMode(GL_MODELVIEW)
@@ -494,6 +487,7 @@ on_display = function()
 
 		set_up_3D_viewport_and_matrices()	-- put it back so we can calc mouse coords
 	end
+
 	glFlush()
 	glutSwapBuffers()
 end
@@ -791,79 +785,77 @@ on_passive_motion = function(xi, yi)
 	glutPostRedisplay()
 end
 
-on_keyboard = (function()
-	---------------
-	-- Key bindings
-	---------------
-	local key_bindings = {
-		['C'] = function()
-				print(string.format("camera: %.3f %.3f %.3f", calc_camera_coords()))
-			end,
-		['L'] = load_labels,
-		['m'] = cycle_through_draw_styles,
-		['P'] =	function()
-				print(string.format("%4.3f %4.3f %4.3f", get_mouse_location()))
-			end,
-		['p'] = add_mouse_label,
-		['?'] = help,
-		['r'] = restart,
-		['h'] = browse_horizontal,
-		['s'] = browse_sagittal,
-		['c'] = browse_coronal,
-		['b'] = browse_all_three,
-		['f'] = zoom_to_fit,
-		['i'] = zoom_in,
-		['t'] = toggle_thumbnails,
-		['F'] = toggle_full_screen,
-		['x'] = make_stripe_fun(2, 0, 0, 0),
-		['y'] = make_stripe_fun(0, 2, 0, 0),
-		['z'] = make_stripe_fun(0, 0, 2, 0),
-		['n'] = no_stripes,
-		['l'] = toggle_position_lock,
-		['q'] = quit,
-	-- Bring up a lua command prompt, for power users
-		[':'] = begin_command_mode
-	}
-	return function(key, xi, yi)
-		if(kb_cmd_mode==1) then
-			-- If it's Enter, then try to execute the command.
-			if(key==13) then
-				local loaded_cmd = loadstring(command)
-				if(loaded_cmd) then
-					local status, result = pcall(loaded_cmd)
-					if(status) then
-						if(result) then
-							print(result)
-						end
-					else
-						bm.warn("Lua error. ", result)
+---------------
+-- Key bindings
+---------------
+local key_bindings = {
+	['C'] = function()
+			print(string.format("camera: %.3f %.3f %.3f", calc_camera_coords()))
+		end,
+	['L'] = load_labels,
+	['m'] = cycle_through_draw_styles,
+	['P'] =	function()
+			print(string.format("%4.3f %4.3f %4.3f", get_mouse_location()))
+		end,
+	['p'] = add_mouse_label,
+	['?'] = help,
+	['r'] = restart,
+	['h'] = browse_horizontal,
+	['s'] = browse_sagittal,
+	['c'] = browse_coronal,
+	['b'] = browse_all_three,
+	['f'] = zoom_to_fit,
+	['i'] = zoom_in,
+	['t'] = toggle_thumbnails,
+	['F'] = toggle_full_screen,
+	['x'] = make_stripe_fun(2, 0, 0, 0),
+	['y'] = make_stripe_fun(0, 2, 0, 0),
+	['z'] = make_stripe_fun(0, 0, 2, 0),
+	['n'] = no_stripes,
+	['l'] = toggle_position_lock,
+	['q'] = quit,
+-- Bring up a lua command prompt, for power users
+	[':'] = begin_command_mode
+}
+
+on_keyboard = function(key, xi, yi)
+	if(kb_cmd_mode==1) then
+		-- If it's Enter, then try to execute the command.
+		if(key==13) then
+			local loaded_cmd = loadstring(command)
+			if(loaded_cmd) then
+				local status, result = pcall(loaded_cmd)
+				if(status) then
+					if(result) then
+						print(result)
 					end
 				else
-					bm.warn("Lua syntax error.")
+					bm.warn("Lua error. ", result)
 				end
-				km_cmd_mode = 0
-				command = ""
-
-			-- If it's backspace or delete, then try to delete the last
-			-- character in the command.
-			elseif(key==8 or key==127) then
-				command = string.sub(command, 1, -2)
-
-			-- If it's Esc or ctrl-c, then abort the command
-			elseif(key==27 or key==3) then
-				kb_cmd_mode = 0
-				command = ""
 			else
-				-- Otherwise, add the character to the command.
-				command = command .. string.char(key)
+				bm.warn("Lua syntax error.")
 			end
+			km_cmd_mode = 0
+			command = ""
+
+		-- If it's backspace or delete, then try to delete the last
+		-- character in the command.
+		elseif(key==8 or key==127) then
+			command = string.sub(command, 1, -2)
+
+		-- If it's Esc or ctrl-c, then abort the command
+		elseif(key==27 or key==3) then
+			kb_cmd_mode = 0
+			command = ""
 		else
-			local f = key_bindings[string.char(key)]
-			if(f) then
-				f(xi, yi)
-				glutPostRedisplay()
-			end
+			-- Otherwise, add the character to the command.
+			command = command .. string.char(key)
 		end
-		glutPostRedisplay()
+	else
+		local f = key_bindings[string.char(key)]
+		if(f) then
+			f(xi, yi)
+		end
 	end
-end)()
+	glutPostRedisplay()
+end
