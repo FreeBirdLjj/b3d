@@ -592,7 +592,7 @@ local zoom_in = function()
 			camera_distance = v*src+u*dist
 		end)
 	else
-		print "Mouse location is suspiciously large.  Is it off the surface?"
+		print("Mouse location is suspiciously large.  Is it off the surface?")
 	end
 end
 
@@ -693,10 +693,10 @@ local begin_command_mode = function()
 end
 
 local load_labels = function()
-	print "load_labels"
+	print("load_labels")
 	local file, err = open("labels.txt")
 	if(err) then
-		print "== Result of wget request =="
+		print("== Result of wget request ==")
 		os.execute("wget http://brainmaps.org/labels.txt")
 	else
 		io.close(file)
