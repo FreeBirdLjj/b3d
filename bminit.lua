@@ -12,9 +12,15 @@ local os = os
 local bm = bm
 
 -- Functions
+local arshift = bit32.arshift
+local abs = math.abs
+
+local band = bit32.band
 local bor = bit32.bor
 
 local cos = math.cos
+
+local exp = math.exp
 
 local floor = math.floor
 
@@ -50,6 +56,7 @@ local gluUnProject = glu.gluUnProject
 local glutBitmapCharacter = glut.glutBitmapCharacter
 local glutFullScreen = glut.glutFullScreen
 local glutGet = glut.glutGet
+local glutGetModifiers = glut.glutGetModifiers
 local glutPostRedisplay = glut.glutPostRedisplay
 local glutReshapeWindow = glut.glutReshapeWindow
 local glutSwapBuffers = glut.glutSwapBuffers
@@ -57,12 +64,12 @@ local glutWireCube = glut.glutWireCube
 
 local load = image.load
 
-local arshift = bit32.arshift
-
 local max = math.max
 local min = math.min
 
 local open = io.open
+
+local pi = math.pi
 
 local sin = math.sin
 local sqrt = math.sqrt
@@ -136,11 +143,6 @@ local GL_COLOR_BUFFER_BIT	= 0x00004000
 local GLUT_DOWN			= 0
 local GLUT_UP			= 1
 local GLUT_LEFT			= 0
-local GLUT_BITMAP_9_BY_15	= "GLUT_BITMAP_9_BY_15"
-local GLUT_BITMAP_8_BY_13	= "GLUT_BITMAP_8_BY_13"
-local GLUT_BITMAP_HELVETICA_10	= "GLUT_BITMAP_HELVETICA_10"
-local GLUT_BITMAP_HELVETICA_12	= "GLUT_BITMAP_HELVETICA_12"
-local GLUT_BITMAP_HELVETICA_18	= "GLUT_BITMAP_HELVETICA_18"
 local GLUT_WINDOW_X		= 100
 local GLUT_WINDOW_Y		= 101
 local GLUT_WINDOW_WIDTH		= 102
@@ -268,11 +270,21 @@ end
 
 local draw_bitmap_string = function(font, s, x, y, z)
 	if(x) then
-		glRasterPos(x, y, z)
+		if(z) then
+			glRasterPos(x, y, z)
+		else
+			glDepthMask(false)
+			glRasterPos(x, y)
+			glDepthMask(true)
+		end
 	end
 	for i = 1, string.len(s) do
 		glutBitmapCharacter(font, string.byte(s, i))
 	end
+end
+
+local show_pos = function(x, y, z)
+	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", x, y, z), x, y, z)
 end
 
 local set_up_3D_viewport_and_matrices = function()
@@ -328,58 +340,50 @@ on_display = function()
 	glScaled(edges[1], edges[2], edges[3])
 	glutWireCube(1.0)
 	glPopMatrix()
-	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", scene_box[1], scene_box[2], scene_box[3]), scene_box[1], scene_box[2], scene_box[3])
-	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", scene_box[4], scene_box[5], scene_box[6]), scene_box[4], scene_box[5], scene_box[6])
+	show_pos(scene_box[1], scene_box[2], scene_box[3])
+	show_pos(scene_box[4], scene_box[5], scene_box[6])
 
 	local x, y, z
 		= get_mouse_location()
+
 	if(locked_position) then
 
 		glDepthMask(false)
-
-		local box = {
-			scene_box[1]-5,
-			scene_box[2]-5,
-			scene_box[3]-5,
-			scene_box[4]+5,
-			scene_box[5]+5,
-			scene_box[6]+5
-		}
 
 		glBegin(GL_QUADS)
 
 		-- coronal
 		glColor(unpack(coronal_plane_color))
-		glVertex(box[1], box[2], z)
-		glVertex(box[1], box[5], z)
-		glVertex(box[4], box[5], z)
-		glVertex(box[4], box[2], z)
+		glVertex(scene_box[1], scene_box[2], z)
+		glVertex(scene_box[1], scene_box[5], z)
+		glVertex(scene_box[4], scene_box[5], z)
+		glVertex(scene_box[4], scene_box[2], z)
 
 		-- horizontal
 		glColor(unpack(horizontal_plane_color))
-		glVertex(box[1], y, box[3])
-		glVertex(box[1], y, box[6])
-		glVertex(box[4], y, box[6])
-		glVertex(box[4], y, box[3])
+		glVertex(scene_box[1], y, scene_box[3])
+		glVertex(scene_box[1], y, scene_box[6])
+		glVertex(scene_box[4], y, scene_box[6])
+		glVertex(scene_box[4], y, scene_box[3])
 
 		-- sagittal
 		glColor(unpack(sagittal_plane_color))
-		glVertex(x, box[2], box[3])
-		glVertex(x, box[2], box[6])
-		glVertex(x, box[5], box[6])
-		glVertex(x, box[5], box[3])
+		glVertex(x, scene_box[2], scene_box[3])
+		glVertex(x, scene_box[2], scene_box[6])
+		glVertex(x, scene_box[5], scene_box[6])
+		glVertex(x, scene_box[5], scene_box[3])
 
 		glEnd()
 
 		-- Draw lines where the planes of section intersect
 		glBegin(GL_LINES)
 		glColor(0.0, 0.0, 0.0, 1.0)	-- back to black
-		glVertex(x, y, box[3])
-		glVertex(x, y, box[6])
-		glVertex(box[1], y, z)
-		glVertex(box[4], y, z)
-		glVertex(x, box[2], z)
-		glVertex(x, box[5], z)
+		glVertex(x, y, scene_box[3])
+		glVertex(x, y, scene_box[6])
+		glVertex(scene_box[1], y, z)
+		glVertex(scene_box[4], y, z)
+		glVertex(x, scene_box[2], z)
+		glVertex(x, scene_box[5], z)
 		glEnd()
 		glDepthMask(true)
 	end
@@ -397,18 +401,18 @@ on_display = function()
 	-- surface.  This hack on the next line should be replaced with something
 	-- smarter.
 	if(x^2+y^2+z^2<(0.75*zfar)^2) then
-		str = string.format("%4.3f %4.3f %4.3f", x, y, z)
+		str = string.format("Mouse location: (%4.3f, %4.3f, %4.3f)", x, y, z)
 	end
 
 	if(str) then
 		glRasterPos(10, h-20)
-		draw_bitmap_string(GLUT_BITMAP_8_BY_13, str)
+		draw_bitmap_string("8x13", str)
 	end
 
 	-- More here: print out other info of interest: frame rate, etc.
 	glRasterPos(10, 10)
 	if(kb_cmd_mode==1) then
-		draw_bitmap_string(GLUT_BITMAP_8_BY_13, "lua> " .. command .. "|")
+		draw_bitmap_string("8x13", "lua> " .. command .. "|")
 	end
 	glPopMatrix()
 	glMatrixMode(GL_MODELVIEW)
@@ -490,6 +494,7 @@ on_display = function()
 
 		set_up_3D_viewport_and_matrices()	-- put it back so we can calc mouse coords
 	end
+
 	glFlush()
 	glutSwapBuffers()
 end
@@ -500,7 +505,7 @@ glutReshapeWindow(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT))
 -- object being viewed.
 
 local zoom_to_fit = function()
-	camera_distance = sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/sin(fovy_deg*math.pi/360.0)/2.0
+	camera_distance = sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/sin(fovy_deg*pi/360.0)/2.0
 	camera_pivot = center
 end
 
@@ -573,7 +578,7 @@ local zoom_in = function()
 		= camera_distance/4.0, camera_distance
 	local x1, y1, z1 = get_mouse_location()
 
-	if(max(math.abs(x1), math.abs(y1), math.abs(z1))<1e4) then
+	if(max(abs(x1), abs(y1), abs(z1))<1e4) then
 		local x0, y0, z0 = unpack(camera_pivot)
 		local cam_off0, start
 			= camera_offset, os.clock()
@@ -594,7 +599,7 @@ local zoom_in = function()
 			camera_distance = v*src+u*dist
 		end)
 	else
-		print "Mouse location is suspiciously large.  Is it off the surface?"
+		print("Mouse location is suspiciously large.  Is it off the surface?")
 	end
 end
 
@@ -695,10 +700,10 @@ local begin_command_mode = function()
 end
 
 local load_labels = function()
-	print "load_labels"
+	print("load_labels")
 	local file, err = open("labels.txt")
 	if(err) then
-		print "== Result of wget request =="
+		print("== Result of wget request ==")
 		os.execute("wget http://brainmaps.org/labels.txt")
 	else
 		io.close(file)
@@ -708,7 +713,7 @@ end
 
 local calc_camera_coords = function()
 	local theta, phi
-		= -y_angle_deg/180.0*math.pi, -x_angle_deg/180.0*math.pi
+		= -y_angle_deg/180.0*pi, -x_angle_deg/180.0*pi
 	local cx, cy, cz = unpack(camera_pivot)
 	return cx+camera_distance*sin(theta)*cos(phi), cy+camera_distance*sin(phi), cz+camera_distance*cos(theta)*cos(phi)
 end
@@ -747,8 +752,8 @@ bm.add_menu_item("Restart (r)", restart)
 bm.add_menu_item("Quit (q)", quit)
 
 on_mouse = function(button, state, xi, yi)
-	shift_is_pressed = bit32.band(glutGetModifiers(), GLUT_ACTIVE_SHIFT)~=0
-	ctrl_is_pressed = bit32.band(glutGetModifiers(), GLUT_ACTIVE_CTRL)~=0
+	shift_is_pressed = band(glutGetModifiers(), GLUT_ACTIVE_SHIFT)~=0
+	ctrl_is_pressed = band(glutGetModifiers(), GLUT_ACTIVE_CTRL)~=0
 	if(state==GLUT_DOWN) then
 		if(button==GLUT_LEFT) then
 			mouse_xi, mouse_yi = xi, yi
@@ -759,7 +764,7 @@ end
 on_motion = function(xi, yi)
 	if(shift_is_pressed) then
 		-- move camera closer in or further out
-		camera_distance = camera_distance/math.exp(0.01*(yi-mouse_yi))
+		camera_distance = camera_distance/exp(0.01*(yi-mouse_yi))
 	elseif(ctrl_is_pressed) then
 		local h = max(1, glutGet(GLUT_WINDOW_HEIGHT))
 		-- z=0 at near clipping plane (http://www.opengl.org/resources/faq/technical/glu.htm)
@@ -787,79 +792,78 @@ on_passive_motion = function(xi, yi)
 	glutPostRedisplay()
 end
 
-on_keyboard = (function()
-	---------------
-	-- Key bindings
-	---------------
-	local key_bindings = {
-		['C'] = function()
-				print(string.format("camera: %.3f %.3f %.3f", calc_camera_coords()))
-			end,
-		['L'] = load_labels,
-		['m'] = cycle_through_draw_styles,
-		['P'] =	function()
-				print(string.format("%4.3f %4.3f %4.3f", get_mouse_location()))
-			end,
-		['p'] = add_mouse_label,
-		['?'] = help,
-		['r'] = restart,
-		['h'] = browse_horizontal,
-		['s'] = browse_sagittal,
-		['c'] = browse_coronal,
-		['b'] = browse_all_three,
-		['f'] = zoom_to_fit,
-		['i'] = zoom_in,
-		['t'] = toggle_thumbnails,
-		['F'] = toggle_full_screen,
-		['x'] = make_stripe_fun(2, 0, 0, 0),
-		['y'] = make_stripe_fun(0, 2, 0, 0),
-		['z'] = make_stripe_fun(0, 0, 2, 0),
-		['n'] = no_stripes,
-		['l'] = toggle_position_lock,
-		['q'] = quit,
-	-- Bring up a lua command prompt, for power users
-		[':'] = begin_command_mode
-	}
-	return function(key, xi, yi)
-		if(kb_cmd_mode==1) then
-			-- If it's Enter, then try to execute the command.
-			if(key==13) then
-				local loaded_cmd = loadstring(command)
-				if(loaded_cmd) then
-					local status, result = pcall(loaded_cmd)
-					if(status) then
-						if(result) then
-							print(result)
-						end
-					else
-						bm.warn("Lua error. ", result)
+---------------
+-- Key bindings
+---------------
+local key_bindings = {
+	['C'] = function()
+			print(string.format("camera: %.3f %.3f %.3f", calc_camera_coords()))
+		end,
+	['L'] = load_labels,
+	['m'] = cycle_through_draw_styles,
+	['P'] =	function()
+			print(string.format("%4.3f %4.3f %4.3f", get_mouse_location()))
+		end,
+	['p'] = add_mouse_label,
+	['?'] = help,
+	['r'] = restart,
+	['h'] = browse_horizontal,
+	['s'] = browse_sagittal,
+	['c'] = browse_coronal,
+	['b'] = browse_all_three,
+	['f'] = zoom_to_fit,
+	['i'] = zoom_in,
+	['t'] = toggle_thumbnails,
+	['F'] = toggle_full_screen,
+	['T'] = toggle_transparency,
+	['x'] = make_stripe_fun(2, 0, 0, 0),
+	['y'] = make_stripe_fun(0, 2, 0, 0),
+	['z'] = make_stripe_fun(0, 0, 2, 0),
+	['n'] = no_stripes,
+	['l'] = toggle_position_lock,
+	['q'] = quit,
+-- Bring up a lua command prompt, for power users
+	[':'] = begin_command_mode
+}
+
+on_keyboard = function(key, xi, yi)
+	if(kb_cmd_mode==1) then
+		-- If it's Enter, then try to execute the command.
+		if(key==13) then
+			local loaded_cmd = loadstring(command)
+			if(loaded_cmd) then
+				local status, result = pcall(loaded_cmd)
+				if(status) then
+					if(result) then
+						print(result)
 					end
 				else
-					bm.warn("Lua syntax error.")
+					bm.warn("Lua error. ", result)
 				end
-				km_cmd_mode = 0
-				command = ""
-
-			-- If it's backspace or delete, then try to delete the last
-			-- character in the command.
-			elseif(key==8 or key==127) then
-				command = string.sub(command, 1, -2)
-
-			-- If it's Esc or ctrl-c, then abort the command
-			elseif(key==27 or key==3) then
-				kb_cmd_mode = 0
-				command = ""
 			else
-				-- Otherwise, add the character to the command.
-				command = command .. string.char(key)
+				bm.warn("Lua syntax error.")
 			end
+			km_cmd_mode = 0
+			command = ""
+
+		-- If it's backspace or delete, then try to delete the last
+		-- character in the command.
+		elseif(key==8 or key==127) then
+			command = string.sub(command, 1, -2)
+
+		-- If it's Esc or ctrl-c, then abort the command
+		elseif(key==27 or key==3) then
+			kb_cmd_mode = 0
+			command = ""
 		else
-			local f = key_bindings[string.char(key)]
-			if(f) then
-				f(xi, yi)
-				glutPostRedisplay()
-			end
+			-- Otherwise, add the character to the command.
+			command = command .. string.char(key)
 		end
-		glutPostRedisplay()
+	else
+		local f = key_bindings[string.char(key)]
+		if(f) then
+			f(xi, yi)
+		end
 	end
-end)()
+	glutPostRedisplay()
+end
