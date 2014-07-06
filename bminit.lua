@@ -808,6 +808,7 @@ local key_bindings = {
 	['i'] = zoom_in,
 	['t'] = toggle_thumbnails,
 	['F'] = toggle_full_screen,
+	['T'] = toggle_transparency,
 	['x'] = make_stripe_fun(2, 0, 0, 0),
 	['y'] = make_stripe_fun(0, 2, 0, 0),
 	['z'] = make_stripe_fun(0, 0, 2, 0),
