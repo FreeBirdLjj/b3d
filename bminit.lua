@@ -57,6 +57,8 @@ local glutWireCube = glut.glutWireCube
 
 local load = image.load
 
+local arshift = bit32.arshift
+
 local max = math.max
 local min = math.min
 
@@ -242,7 +244,7 @@ do
 	end
 end
 
-local center = { (scene_box[1]+scene_box[4])/2, (scene_box[2]+scene_box[5])2, (scene_box[3]+scene_box[6])/2 }
+local center = { (scene_box[1]+scene_box[4])/2, (scene_box[2]+scene_box[5])/2, (scene_box[3]+scene_box[6])/2 }
 local edges = { scene_box[4]-scene_box[1], scene_box[5]-scene_box[2], scene_box[6]-scene_box[3] }
 
 local get_coronal_index_from_mouse = function()
