@@ -6,10 +6,10 @@
 # Your platform. See PLATS for possible values.
 PLAT= none
 
-CC= clang
-CFLAGS= -O4 `llvm-config --cflags` -Wall -DLUA_COMPAT_ALL $(SYSCFLAGS) $(MYCFLAGS)
-LDFLAGS= `llvm-config --ldflags` $(SYSLDFLAGS) $(MYLDFLAGS)
-LIBS= `llvm-config --libs core` -lm $(SYSLIBS) $(MYLIBS)
+CC= gcc
+CFLAGS= -O2 -Wall -DLUA_COMPAT_ALL $(SYSCFLAGS) $(MYCFLAGS)
+LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
+LIBS= -lm $(SYSLIBS) $(MYLIBS)
 
 AR= ar rcu
 RANLIB= ranlib
