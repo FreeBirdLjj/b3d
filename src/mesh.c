@@ -89,25 +89,27 @@ void mesh_draw(mesh_t *mesh){
 			 * is needed into computing good normals for triangle meshes.
 			 * -ijt
 			 */
-			for(j = 0; j<3; j++){
-				float normalizer;
-				switch(normal_style){
-				case NS_DIV_BY_AREA:
-					normalizer = nlen2;
-					break;
-				case NS_NORMALIZE:
-					normalizer = sqrt(nlen2);
-					break;
-				case NS_MUL_BY_AREA:
-				case NS_FLAT:
-					normalizer = 1.0f;	/* not used */
-					break;
-				default:
-					fprintf(stderr, "bad normal style\n");
-					normalizer = 1.0f;
-					break;
+			float normalizer;
+			switch(normal_style){
+			case NS_DIV_BY_AREA:
+				normalizer = nlen2;
+				break;
+			case NS_NORMALIZE:
+				normalizer = sqrt(nlen2);
+				break;
+			case NS_MUL_BY_AREA:
+			case NS_FLAT:
+				normalizer = 1.0f;	/* not used */
+				break;
+			default:
+				fprintf(stderr, "bad normal style\n");
+				normalizer = 1.0f;
+				break;
+			}
+			if(normalizer>0.0f){
+				for(j = 0; j<3; j++){
+					n[j] /= normalizer;
 				}
-				n[j] /= normalizer==0.0f? 1.0 : normalizer;
 			}
 
 			for(j = 0; j<3; j++)
