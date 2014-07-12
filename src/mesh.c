@@ -29,10 +29,11 @@ float dot3(float a[3], float b[3]){
 
 void calc_face_normal(mesh_t *mesh, float n[3], int fi){
 	int *t = mesh->tris[fi].iv;
+	int i;
 	float a[3], b[3];	/* first and second edge vectors */
-	for(fi = 0; fi<3; fi++){
-		a[fi] = mesh->verts[t[1]].p[fi]-mesh->verts[t[0]].p[fi];
-		b[fi] = mesh->verts[t[2]].p[fi]-mesh->verts[t[1]].p[fi];
+	for(i = 0; i<3; i++){
+		a[i] = mesh->verts[t[1]].p[i]-mesh->verts[t[0]].p[i];
+		b[i] = mesh->verts[t[2]].p[i]-mesh->verts[t[1]].p[i];
 	}
 	/* n := a x b; */
 	n[0] = a[1]*b[2]-a[2]*b[1];
@@ -41,7 +42,7 @@ void calc_face_normal(mesh_t *mesh, float n[3], int fi){
 }
 
 
-/* This function is intended to only be called once, to construct the display 
+/* This function is intended to only be called once, to construct the display
  * list.  Thereafter the display list should be used. */
 void mesh_draw(mesh_t *mesh){
 	fprintf(stderr, "Regenerating mesh for OpenGL...\n"
@@ -64,82 +65,96 @@ void mesh_draw(mesh_t *mesh){
 	}
 
 	int i, j, k;
+	float *norms = (float *)malloc(mesh->nt*3*sizeof(float));
 
 	/* Compute vertex normals */
 	if(normal_style!=NS_FLAT){
 		fprintf(stderr, "Computing vertex normals.\n");
 
 		/* First, zero out the normal accumulators at the vertices */
-		for(i = 0; i<mesh->nv; i++)
-			for(k = 0; k<3; k++)
+		for(i = 0; i<mesh->nv; i++){
+			for(k = 0; k<3; k++){
 				mesh->verts[i].n[k] = 0.0f;
+			}
+		}
 
 		/* Average the face normals at the vertices */
 		for(i = 0; i<mesh->nt; i++){
-			float n[3];	/* face normal */
+			float *n = &norms[i*3];			/* face normal */
 			int *t = mesh->tris[i].iv;
 			calc_face_normal(mesh, n, i);
 			float nlen2 = dot3(n, n);
 
-			/* Triangles with greater area contribute less to the 
+			/* Triangles with greater area contribute less to the
 			 * computation of the vertex normal, since they probably
-			 * are less accurate indications of the vertex normal. 
+			 * are less accurate indications of the vertex normal.
 			 * Anyway, that's how it seems on paper, but in practice
-			 * this idea doesn't work so well.  More investigation 
+			 * this idea doesn't work so well.  More investigation
 			 * is needed into computing good normals for triangle meshes.
 			 * -ijt
 			 */
-			float normalizer;
-			switch(normal_style){
-			case NS_DIV_BY_AREA:
-				normalizer = nlen2;
-				break;
-			case NS_NORMALIZE:
-				normalizer = sqrt(nlen2);
-				break;
-			case NS_MUL_BY_AREA:
-			case NS_FLAT:
-				normalizer = 1.0f;	/* not used */
-				break;
-			default:
-				fprintf(stderr, "bad normal style\n");
-				normalizer = 1.0f;
-				break;
-			}
-			if(normalizer>0.0f){
+			if(nlen2>0.0f){
+				float nlen;
+				switch(normal_style){
+				case NS_DIV_BY_AREA:
+					nlen = nlen2;
+					break;
+				case NS_NORMALIZE:
+					nlen = sqrtf(nlen2);
+					break;
+				case NS_MUL_BY_AREA:
+				case NS_FLAT:
+					nlen = 1.0f;	/* not used */
+					break;
+				default:
+					fprintf(stderr, "bad normal style\n");
+					nlen = 1.0f;
+					break;
+				}
 				for(j = 0; j<3; j++){
-					n[j] /= normalizer;
+					n[j] /= nlen;
+				}
+
+				for(j = 0; j<3; j++){
+					for(k = 0; k<3; k++){
+						mesh->verts[t[j]].n[k] += n[k];
+					}
 				}
 			}
-
-			for(j = 0; j<3; j++)
-				for(k = 0; k<3; k++)
-					mesh->verts[t[j]].n[k] += n[k];
 		}
 
 		/* Normalize */
 		int num_zero_normals = 0;
 
 		for(i = 0; i<mesh->nv; i++){
-			float *n = mesh->verts[i].n, nlen2 = dot3(n, n);
-			if(nlen2==0.0)
+			float *n = mesh->verts[i].n;
+			float nlen2 = dot3(n, n);
+			if(nlen2==0.0f){
 				num_zero_normals++;
-			else
-				for(k = 0; k<3; n[k++] /= sqrt(nlen2));
+			}
+			else{
+				float nlen = sqrtf(nlen2);
+				for(k = 0; k<3; k++){
+					n[k] /= nlen;
+				}
+			}
 		}
 
-		if(num_zero_normals)
+		if(num_zero_normals){
 			fprintf(stderr, "%i normals have zero length.\n", num_zero_normals);
+		}
 	}
 
 	/* Convert the surface to a format that OpenGL can easily digest. */
 	fprintf(stderr, "Converting mesh to a raw OpenGL format...\n");
-	mesh->gl_tris = malloc(mesh->nt*sizeof(gl_triangle_t));
+	gl_triangle_t *gl_tris = (gl_triangle_t *)malloc(mesh->nt*sizeof(gl_triangle_t));
 	for(i = 0; i<mesh->nt; i++){
-		float n[3];
-		gl_triangle_t *glt = &mesh->gl_tris[i];
+		float *n = &norms[i*3];
+		gl_triangle_t *glt = &gl_tris[i];
 		int *t = mesh->tris[i].iv;
-		calc_face_normal(mesh, n, i);
+		if(normal_style==NS_FLAT){
+			calc_face_normal(mesh, n, i);
+		}
 		for(j = 0; j<3; j++){
 			vertex_t *v = &mesh->verts[t[j]];
 			for(k = 0; k<3; k++) {
@@ -152,23 +167,26 @@ void mesh_draw(mesh_t *mesh){
 		 * We can do this because these new vertices are duplicated for each
 		 * triangle.
 		 */
-		for(j = 0; j<3; j++)
-			if(dot3(glt->vv[j].n, n)<0.0)
-				for(k = 0; k<3; glt->vv[j].n[k++] *= -1.0f);
+		for(j = 0; j<3; j++){
+			if(dot3(glt->vv[j].n, n)<0.0){
+				for(k = 0; k<3; k++){
+					glt->vv[j].n[k] = 0-glt->vv[j].n[k];
+				}
+			}
+		}
 	}
 	if(verbosity>=1)
 		fprintf(stderr, "Done.\n");
 
 	/* Send the data to OpenGL. */
-	glInterleavedArrays(GL_N3F_V3F, /* stride */ 0, mesh->gl_tris);
+	glInterleavedArrays(GL_N3F_V3F, /* stride */ 0, gl_tris);
 	glDrawArrays(GL_TRIANGLES, 0, mesh->nt*3);
 
-	free(mesh->gl_tris);
-	mesh->gl_tris = NULL;
+	free(gl_tris);
 }
 
 static mesh_t *checkmesh(lua_State *L){
-	mesh_t *m = (mesh_t *)luaL_checkudata(L, 1, "brainmaps_mesh");	
+	mesh_t *m = (mesh_t *)luaL_checkudata(L, 1, "brainmaps_mesh");
 	luaL_argcheck(L, m!=NULL, 1, "`mesh' expected");
 	return m;
 }
@@ -207,9 +225,9 @@ int mesh_load(mesh_t *mesh, FILE *file){
 		return -1;
 	}
 
-	mesh->verts = malloc(mesh->nv*sizeof(vertex_t));
-	mesh->tris = malloc(mesh->nt*sizeof(triangle_t));
-	if(!(mesh->verts&&mesh->tris)){
+	mesh->verts = (vertex_t *)malloc(mesh->nv*sizeof(vertex_t));
+	mesh->tris = (triangle_t *)malloc(mesh->nt*sizeof(triangle_t));
+	if((!mesh->verts)||(!mesh->tris)){
 		fprintf(stderr, "Memory allocation failed.\n");
 		return -1;
 	}
@@ -219,30 +237,38 @@ int mesh_load(mesh_t *mesh, FILE *file){
 			fprintf(stderr, "Premature eof (vertices).\n");
 			return -1;
 		}
+
 		float *v = mesh->verts[i].p;
-		if(sscanf(buf, "%f %f %f", &v[0], &v[1], &v[2])!=3)
+		if(sscanf(buf, "%f %f %f", &v[0], &v[1], &v[2])!=3){
 			fprintf(stderr, "Expected three vertex indices but got %s on line %i\n", buf, line_num);
+		}
+
+		/* Compute the bounding box. */
+		if(i==0){
+			for(j = 0; j<3; j++){
+				mesh->pmin[j] = mesh->pmax[j] = v[j];
+			}
+		}
+		else{
+			for(j = 0; j<3; j++){
+				mesh->pmin[j] = min(mesh->pmin[j], v[j]);
+				mesh->pmax[j] = max(mesh->pmax[j], v[j]);
+			}
+		}
 	}
+
 	for(i = 0; i<mesh->nt; i++){
 		if(!get_line(buf, sizeof(buf), file)){
 			fprintf(stderr, "Premature eof (triangles).\n");
 			return -1;
 		}
+
 		int *v = mesh->tris[i].iv;
 		if(sscanf(buf, "%d %d %d", &v[0], &v[1], &v[2])!=3){
 			fprintf(stderr, "Bad format on line %d. Expected three vertex indices, but got\n%s\n", line_num, buf);
 			return -1;
 		}
 	}
-	
-	/* Compute the bounding box. */
-	for(j = 0; j<3; j++)
-		mesh->pmin[j] = mesh->pmax[j] = mesh->verts[0].p[j];
-	for(i = 1; i<mesh->nv; i++) 
-		for(j = 0; j<3; j++){
-			mesh->pmin[j] = min(mesh->pmin[j], mesh->verts[i].p[j]);
-			mesh->pmax[j] = max(mesh->pmax[j], mesh->verts[i].p[j]);
-		}
 
 	/* Set up the display list */
 	mesh->gl_display_list = glGenLists(1);
@@ -257,16 +283,19 @@ int mesh_load(mesh_t *mesh, FILE *file){
 static int l_mesh_load(lua_State *L){
 	const char *filename = luaL_checkstring(L, 1);
 	mesh_t *m = (mesh_t *)lua_newuserdata(L, sizeof(mesh_t));
-	FILE *file;
+	FILE *file = fopen(filename, "r");
+
+	if(!file){
+		luaL_error(L, "Could not open %s for reading.\n", filename);
+	}
 
 	/* Set the mesh's metatable. */
 	luaL_getmetatable(L, "brainmaps_mesh");
 	lua_setmetatable(L, -2);
 
-	if(!(file = fopen(filename, "r")))
-		luaL_error(L, "Could not open %s for reading.\n", filename);
-	if(mesh_load(m, file))
+	if(mesh_load(m, file)){
 		luaL_error(L, "Failed to load mesh file %s", filename);
+	}
 	fclose(file);
 
 	return 1;	/* The mesh pointer is on top of the stack. */
@@ -295,8 +324,9 @@ static const struct luaL_Reg meshlib_m[] = {
 
 static int mesh_gc(lua_State *L){
 	mesh_t *m = checkmesh(L);
-	if(verbosity>=1)
+	if(verbosity>=1){
 		fprintf(stderr, "Freeing mesh %p\n", m);
+	}
 	if(m){
 		glDeleteLists(m->gl_display_list, 1);
 		free(m->verts);
