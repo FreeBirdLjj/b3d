@@ -25,6 +25,7 @@ local exp = math.exp
 local floor = math.floor
 
 local glBegin = gl.glBegin
+local glCallList = gl.glCallList
 local glClear = gl.glClear
 local glClearColor = gl.glClearColor
 local glColor = gl.glColor
@@ -32,11 +33,14 @@ local glDepthMask = gl.glDepthMask
 local glDisable = gl.glDisable
 local glEnable = gl.glEnable
 local glEnd = gl.glEnd
+local glEndList = gl.glEndList
 local glFlush = gl.glFlush
+local glGenLists = gl.glGenLists
 local glGetDoublev = gl.glGetDoublev
 local glLoadIdentity = gl.glLoadIdentity
 local glMaterial = gl.glMaterial
 local glMatrixMode = gl.glMatrixMode
+local glNewList = gl.glNewList
 local glOrtho = gl.glOrtho
 local glPixelZoom = gl.glPixelZoom
 local glPointSize = gl.glPointSize
@@ -140,6 +144,9 @@ local GL_S			= 0x2000
 local GL_DEPTH_BUFFER_BIT	= 0x00000100
 local GL_COLOR_BUFFER_BIT	= 0x00004000
 
+-- Display Lists
+local GL_COMPILE		= 0x1300
+
 local GLUT_DOWN			= 0
 local GLUT_UP			= 1
 local GLUT_LEFT			= 0
@@ -157,7 +164,7 @@ local GLUT_ACTIVE_ALT		= 4
 
 local browser_path, pager_path
 	= "firefox", "firefox"
-local meshes = {mesh.load("data/cortex.mesh")}
+local mesh_obj = mesh.load("data/cortex.mesh")
 local labels = {}
 local fovy_deg, camera_distance, znear, zfar, x_angle_deg, y_angle_deg, label_point_size
 	= 45.0, 2.0, 1.0, 1e5, 0.0, 0.0, 5.0
@@ -170,7 +177,7 @@ local axes_color, stripe_color, mesh_color, horizontal_plane_color, coronal_plan
 local draw_mode = GL_FILL
 local showing_planes = nil
 local locked_position = nil
-local scene_box = {}
+local scene_box = {mesh_obj:get_bounds()}
 local kb_cmd_mode = false
 
 local command = ""				-- command being entered by the user
@@ -227,25 +234,6 @@ local get_mouse_location = function()
 	return gluUnProject(real_x, real_y, glReadPixels(real_x, real_y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT))
 end
 
-do
-	local boxes = {}
-	local i = 1
-	for _, mesh in pairs(meshes) do
-		boxes[i] = { mesh:get_bounds() }
-		i = i+1
-	end
-	if(i==1) then
-		error("calc_max_bounds needs at least one box in the list")
-	end
-	scene_box = boxes[1]
-	local set_scene = { min, min, min, max, max, max }
-	for j = 2, i-1 do
-		for k = 1, 6 do
-			scene_box[k] = set_scene(scene_box[k], boxes[j][k])
-		end
-	end
-end
-
 local center = { (scene_box[1]+scene_box[4])/2, (scene_box[2]+scene_box[5])/2, (scene_box[3]+scene_box[6])/2 }
 local edges = { scene_box[4]-scene_box[1], scene_box[5]-scene_box[2], scene_box[6]-scene_box[3] }
 
@@ -278,6 +266,17 @@ end
 local show_pos = function(x, y, z)
 	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", x, y, z), x, y, z)
 end
+
+local draw_box_list = glGenLists(1)
+glNewList(draw_box_list, GL_COMPILE)
+glPushMatrix()
+glTranslated(center[1], center[2], center[3], 1)
+glScaled(edges[1], edges[2], edges[3])
+glutWireCube(1.0)
+glPopMatrix()
+show_pos(scene_box[1], scene_box[2], scene_box[3])
+show_pos(scene_box[4], scene_box[5], scene_box[6])
+glEndList()
 
 local set_up_3D_viewport_and_matrices = function()
 	local w, h = max(1, glutGet(GLUT_WINDOW_WIDTH)), max(1, glutGet(GLUT_WINDOW_HEIGHT))
@@ -316,9 +315,7 @@ on_display = function()
 		glEnable(GL_TEXTURE_1D)
 		glEnable(GL_TEXTURE_GEN_S)
 	end
-	for _, mesh in pairs(meshes) do
-		mesh:draw()
-	end
+	mesh_obj:draw()
 	if(candy_striping) then
 		glDisable(GL_TEXTURE_1D)
 		glDisable(GL_TEXTURE_GEN_S)
@@ -327,13 +324,7 @@ on_display = function()
 	glDisable(GL_LIGHTING)
 
 	glColor(unpack(axes_color))
-	glPushMatrix()
-	glTranslated(center[1], center[2], center[3], 1)
-	glScaled(edges[1], edges[2], edges[3])
-	glutWireCube(1.0)
-	glPopMatrix()
-	show_pos(scene_box[1], scene_box[2], scene_box[3])
-	show_pos(scene_box[4], scene_box[5], scene_box[6])
+	glCallList(draw_box_list)
 
 	local x, y, z = get_mouse_location()
 
@@ -496,8 +487,6 @@ on_display = function()
 	glutSwapBuffers()
 end
 
-glutReshapeWindow(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT))
-
 -- It's not really zooming but moving the camera toward or away from the
 -- object being viewed.
 
@@ -580,8 +569,8 @@ local zoom_in = function()
 
 	if(max(abs(x1), abs(y1), abs(z1))<1e4) then
 		local x0, y0, z0 = unpack(camera_pivot)
-		local cam_off0, start
-			= camera_offset, os.clock()
+		local cam_off0 = camera_offset
+		local start = os.clock()
 		bm.set_idle_callback(function()
 			local t = os.clock()-start
 			if(t>=1.0) then
@@ -731,7 +720,7 @@ bm.reset_menu()
 bm.add_menu_item("Zoom in (i)", zoom_in)
 bm.add_menu_item("Zoom to fit (f)", zoom_to_fit)
 bm.add_menu_item("Toggle full screen (F)", toggle_full_screen)
-bm.add_menu_item("Toggle transparency", toggle_transparency)
+bm.add_menu_item("Toggle transparency (T)", toggle_transparency)
 bm.add_menu_item("Toggle thumbnails (t)", toggle_thumbnails)
 bm.add_menu_item("Toggle position lock (l)", toggle_position_lock)
 bm.add_menu_item("Browse coronal (c)", browse_coronal)

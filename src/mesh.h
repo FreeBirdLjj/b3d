@@ -21,7 +21,6 @@ typedef struct{
 	int nv, nt;		/* number of vertices and triangles */
 	vertex_t *verts; 
 	triangle_t *tris; 
-	gl_triangle_t *gl_tris; 
 	GLuint gl_display_list;
 	GLfloat pmin[3];	/* min corner point of the bounding box */
 	GLfloat pmax[3];	/* max corner point */

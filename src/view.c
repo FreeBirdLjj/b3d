@@ -21,7 +21,7 @@ void display(void){
 	/* Do the Lua display callback `on_display' if it is defined. */
 	lua_getglobal(lua_state, "on_display");
 	if(lua_isfunction(lua_state, -1)){
-		if(lua_pcall(lua_state, 0, 0, 0)){ 
+		if(lua_pcall(lua_state, 0, 0, 0)){
 			char msg[3*80];
 			snprintf(msg, sizeof(msg), "Lua display callback (on_display) failed: %s.  Removing the display callback.\n", lua_tostring(lua_state, -1));
 			fprintf(stderr, "Warning: %s\n", msg);
@@ -43,7 +43,7 @@ void mouse(int button, int state, int xi, int yi){
 		lua_pushnumber(lua_state, state);
 		lua_pushnumber(lua_state, xi);
 		lua_pushnumber(lua_state, yi);
-		if(lua_pcall(lua_state, 4, 0, 0)){ 
+		if(lua_pcall(lua_state, 4, 0, 0)){
 			char msg[3*80];
 			snprintf(msg, sizeof(msg), "Lua mouse callback failed: %s\n", lua_tostring(lua_state, -1));
 			fprintf(stderr, "Warning: %s\n", msg);
@@ -58,7 +58,7 @@ void motion(int xi, int yi){
 	if(lua_isfunction(lua_state, -1)){
 		lua_pushnumber(lua_state, xi);
 		lua_pushnumber(lua_state, yi);
-		if(lua_pcall(lua_state, 2, 0, 0)){ 
+		if(lua_pcall(lua_state, 2, 0, 0)){
 			char msg[3*80];
 			snprintf(msg, sizeof(msg), "Lua motion callback failed: %s\n", lua_tostring(lua_state, -1));
 			fprintf(stderr, "Warning: %s\n", msg);
@@ -85,11 +85,11 @@ void passive_motion(int xi, int yi){
 
 void idle(void){
 	/* Note: Moving this usleep call to the bottom of the function makes the
-	 * window go blank if on_idle is undefined in lua.  
+	 * window go blank if on_idle is undefined in lua.
 	 * */
 	lua_getglobal(lua_state, "on_idle");
 	if(lua_isfunction(lua_state, -1)){
-		if(lua_pcall(lua_state, 0, 0, 0)){ 
+		if(lua_pcall(lua_state, 0, 0, 0)){
 			char msg[3*80];
 			snprintf(msg, sizeof(msg), "Lua idle callback failed: %s\nIdling is now turned off.\n", lua_tostring(lua_state, -1));
 			fprintf(stderr, "Warning: %s\n", msg);
@@ -158,6 +158,7 @@ void menu_callback(int option){
 
 void view(char *title){
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DEPTH|GLUT_DOUBLE);
+	glutInitWindowSize(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
 	glutCreateWindow(title);
 	glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyboard_up);
