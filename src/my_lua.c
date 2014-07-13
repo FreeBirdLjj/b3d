@@ -1,23 +1,6 @@
-/* Much of the code in this file comes from lua-5.0.2/src/lua/lua.c */
+/* Much of the code in this file comes from lua-5.2.3/src/lua/lua.c */
 
-#include "image.h"
-#include "mesh.h"
 #include "my_lua.h"
-#include "globals.h"
-#include "utils.h"
-#include "view.h"
-#include "lua_gl.h"
-#include "lua_glu.h"
-#include "lua_glut.h"
-
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-
-#include <math.h>
-#include <assert.h>
-#include <string.h>
-#include <unistd.h>
 
 int l_warn(lua_State *L){
 	fprintf(stderr, "Warning: %s\n", luaL_checkstring(L, 1));
@@ -38,7 +21,7 @@ int l_add_menu_item(lua_State *L){
 	static int index = 0;
 	luaL_checktype(L, 2, LUA_TFUNCTION);
 
-	/* Add the callback function to the menu_callbacks table, 
+	/* Add the callback function to the menu_callbacks table,
 	 * with the index as its key. */
 	lua_getglobal(L, "menu_callbacks");
 	lua_pushnumber(L, index);
@@ -48,7 +31,7 @@ int l_add_menu_item(lua_State *L){
 	assert(lua_isfunction(L, -1));
 	lua_settable(L, -3);
 
-	glutAddMenuEntry(luaL_checkstring(L, 1), index); 
+	glutAddMenuEntry(luaL_checkstring(L, 1), index);
 	lua_pushnumber(L, index++);
 	return 1;
 }
@@ -64,7 +47,7 @@ int l_os(lua_State *L){
 	return 1;
 }
 
-/* Some of the code in this function was taken from Microsoft's 
+/* Some of the code in this function was taken from Microsoft's
    documentation on their website. */
 int l_run_process_in_background(lua_State *L){
 	char *command_line = strdup(luaL_checkstring(L, 1));

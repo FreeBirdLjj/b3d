@@ -1,8 +1,18 @@
-#ifndef MESH_INCLUDED
-#define MESH_INCLUDED
+#ifndef __B3D_MESH_H__
+#define __B3D_MESH_H__
 
-#include "my_lua.h"
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
+#include <stdio.h>
+#include <ctype.h>
+#include <math.h>
+
+#include "globals.h"
+#include "utils.h"
+#include "my_lua.h"
 
 typedef struct{
 	float n[3];	/* normal */
@@ -17,10 +27,10 @@ typedef struct{
 	vertex_t vv[3];
 }gl_triangle_t;
 
-typedef struct{ 
+typedef struct{
 	int nv, nt;		/* number of vertices and triangles */
-	vertex_t *verts; 
-	triangle_t *tris; 
+	vertex_t *verts;
+	triangle_t *tris;
 	GLuint gl_display_list;
 	GLfloat pmin[3];	/* min corner point of the bounding box */
 	GLfloat pmax[3];	/* max corner point */
@@ -29,4 +39,3 @@ typedef struct{
 int luaopen_mesh(lua_State *L);
 
 #endif
-

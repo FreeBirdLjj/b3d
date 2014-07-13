@@ -1,5 +1,5 @@
-#ifndef GLOBALS_INCLUDED
-#define GLOBALS_INCLUDED
+#ifndef __B3D_GLOBALS_H__
+#define __B3D_GLOBALS_H__
 
 #include <GL/glut.h>
 #include <lua.h>
@@ -22,4 +22,3 @@ extern GLdouble alpha;
 extern GLenum polygon_mode;
 
 #endif
-

@@ -1,8 +1,10 @@
-#ifndef LUA_BIND_INCLUDED
-#define LUA_BIND_INCLUDED
+#ifndef __B3D_LUA_BIND_H__
+#define __B3D_LUA_BIND_H__
+
+#include <lua.h>
 
 /* This macro binds a function with no returns and one argument that maps to a
- * specified Lua type.  The others are analogous, with types t1, t2, etc.  
+ * specified Lua type.  The others are analogous, with types t1, t2, etc.
  * -ijt */
 #define BIND_0_1(f, type)	\
 	int l_ ## f(lua_State *L){	\

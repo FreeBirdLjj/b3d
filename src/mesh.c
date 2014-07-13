@@ -1,8 +1,3 @@
-#include "globals.h"
-#include <stdio.h>
-#include <ctype.h>
-#include <math.h>
-#include "utils.h"
 #include "mesh.h"
 
 int is_blank_line(char *s){
@@ -251,8 +246,8 @@ int mesh_load(mesh_t *mesh, FILE *file){
 		}
 		else{
 			for(j = 0; j<3; j++){
-				mesh->pmin[j] = min(mesh->pmin[j], v[j]);
-				mesh->pmax[j] = max(mesh->pmax[j], v[j]);
+				mesh->pmin[j] = MIN(mesh->pmin[j], v[j]);
+				mesh->pmax[j] = MAX(mesh->pmax[j], v[j]);
 			}
 		}
 	}
