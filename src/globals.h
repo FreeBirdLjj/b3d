@@ -1,7 +1,11 @@
 #ifndef __B3D_GLOBALS_H__
 #define __B3D_GLOBALS_H__
 
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
 #include <lua.h>
 
 #define MAX_LABEL_LEN	10*80
