@@ -14,14 +14,14 @@
  * impractical, such as glDrawPixels().
  *
  * Some functions have been bound because they are important, others because
- * they were easy to bind.  
+ * they were easy to bind.
  *
  * */
 
 
 /* Here is the comment at the top of the Mesa GL header from which this file
  * is derived: */
- 
+
 /*
  * Mesa 3-D graphics library
  * Version:  6.3
@@ -46,15 +46,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-
-
-
-#include <GL/glut.h>
-#include "my_lua.h"
-#include "lua_bind.h"
-
-#include <float.h>
-#include <stdlib.h>
+#include "lua_gl.h"
 
 /* untested. -ijt */
 BIND_0_1(glBegin, int);
@@ -70,7 +62,7 @@ int l_glVertex(lua_State *L){
 			luaL_checknumber(L, 1),
 			luaL_checknumber(L, 2),
 			luaL_checknumber(L, 3)
-		); 
+		);
 		break;
 	case 4:
 		glVertex4d(
@@ -78,13 +70,13 @@ int l_glVertex(lua_State *L){
 			luaL_checknumber(L, 2),
 			luaL_checknumber(L, 3),
 			luaL_checknumber(L, 4)
-		); 
+		);
 		break;
 	default:
 		luaL_error(L, "Wrong number of arguments to glVertex().  Need 2,3, or 4.");
 		break;
 	}
-	return 0; 
+	return 0;
 }
 
 BIND_0_3(glNormal3d, number, number, number)
@@ -96,7 +88,7 @@ int l_glColor(lua_State *L){
 			luaL_checknumber(L, 1),
 			luaL_checknumber(L, 2),
 			luaL_checknumber(L, 3)
-		); 
+		);
 		break;
 	case 4:
 		glColor4d(
@@ -110,7 +102,7 @@ int l_glColor(lua_State *L){
 		luaL_error(L,"Wrong number of arguments to glColor().  Need 3 or 4.");
 		break;
 	}
-	return 0; 
+	return 0;
 }
 
 int l_glRasterPos(lua_State *L){
@@ -123,21 +115,21 @@ int l_glRasterPos(lua_State *L){
 			luaL_checknumber(L, 1),
 			luaL_checknumber(L, 2),
 			luaL_checknumber(L, 3)
-		); 
+		);
 		break;
-	case 4: 
+	case 4:
 		glRasterPos4d(
 			luaL_checknumber(L, 1),
 			luaL_checknumber(L, 2),
 			luaL_checknumber(L, 3),
 			luaL_checknumber(L, 4)
-		); 
+		);
 		break;
 	default:
 		luaL_error(L, "Wrong number of arguments to glRasterPos().  Need 2,3, or 4.");
 		break;
 	}
-	return 0; 
+	return 0;
 }
 
 int l_glTexCoord(lua_State *L){
@@ -153,7 +145,7 @@ int l_glTexCoord(lua_State *L){
 			luaL_checknumber(L, 1),
 			luaL_checknumber(L, 2),
 			luaL_checknumber(L, 3)
-		); 
+		);
 		break;
 	case 4:
 		glTexCoord4d(
@@ -161,7 +153,7 @@ int l_glTexCoord(lua_State *L){
 			luaL_checknumber(L, 2),
 			luaL_checknumber(L, 3),
 			luaL_checknumber(L, 4)
-		); 
+		);
 		break;
 	default:
 		luaL_error(L, "Wrong number of arguments to glTexCoord().  Need 1,2,3, or 4.");
@@ -177,7 +169,7 @@ int l_glRect(lua_State *L){
 		luaL_checknumber(L, 3),
 		luaL_checknumber(L, 4)
 	);
-	return 0; 
+	return 0;
 }
 
 int l_glMaterial(lua_State *L){
@@ -299,7 +291,7 @@ int luaL_getn(lua_State *L, int t){
 		return n;
 	for(n = 1; ; n++){		/* else must count elements */
 		lua_rawgeti(L, t, n);
-		if(lua_isnil(L, -1)) 
+		if(lua_isnil(L, -1))
 			break;
 		lua_pop(L, 1);
 	}
@@ -310,7 +302,7 @@ int luaL_getn(lua_State *L, int t){
 GLfloat *float_array_from_table_in_final_arg(lua_State *L, int *n){
 	int i;
 	*n = luaL_getn(L, -1);
-	GLfloat *ret = malloc((*n)*sizeof(ret[0])); 
+	GLfloat *ret = malloc((*n)*sizeof(ret[0]));
 	for(i = 0; i<*n; i++){
 		lua_pushnumber(L, i+1);
 		lua_gettable(L, -2);
@@ -461,7 +453,7 @@ BIND_0_1(glCallList, int);
 BIND_0_1(glListBase, int);
 
 /*
- * Lighting  
+ * Lighting
  */
 
 BIND_0_1(glShadeModel, int);
@@ -585,7 +577,7 @@ int l_glTexImage2D(lua_State *L){
 	luaL_argcheck(L, luaL_checkint(L, 8)==GL_FLOAT, 8, "The type argument of glTexImage2D should be GL_FLOAT, since it is the only\ntype that is currently supported.\n");
 	glTexImage2D(luaL_checkint(L, 1), luaL_checkint(L, 2), luaL_checkint(L, 3), luaL_checkint(L, 4), luaL_checkint(L, 5), luaL_checkint(L, 6), luaL_checkint(L, 7), luaL_checkint(L, 8), pixels);
 	free(pixels);
-	return 0; 
+	return 0;
 }
 
 
@@ -608,9 +600,9 @@ int l_glGenTextures(lua_State *L){
 	return n;
 }
 
-/* This wrapper just takes a variable number of texture arguments. 
+/* This wrapper just takes a variable number of texture arguments.
  * The number of textures must not be included in the argument list,
- * unlike the C version of glDeleteTextures. 
+ * unlike the C version of glDeleteTextures.
  */
 int l_glDeleteTextures(lua_State *L){
 	int i;

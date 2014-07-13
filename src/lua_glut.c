@@ -1,8 +1,4 @@
-#include <GL/glut.h>
-#include "my_lua.h"
-#include "lua_bind.h"
-#include <stdlib.h>
-#include <string.h>
+#include "lua_glut.h"
 
 /* GLUT initialization sub-API. */
 
@@ -10,12 +6,14 @@
 int l_glutInit(lua_State *L){
 	int i;
 	int argc = lua_gettop(L), saved_argc = lua_gettop(L);
-	char **argv = calloc(argc+1, sizeof(char *));
-	for(i = 0; i<argc; i++)
+	char **argv = (char **)calloc(argc+1, sizeof(char *));
+	for(i = 0; i<argc; i++){
 		argv[i] = strdup(luaL_checkstring(L, i+1));
+	}
 	glutInit(&argc, argv);
-	for(i = 0; i<saved_argc; i++)
+	for(i = 0; i<saved_argc; i++){
 		free(argv[i]);
+	}
 	free(argv);
 	return 0;
 }
@@ -110,7 +108,7 @@ BIND_1_1(number, glutLayerGet, int)
 #endif
 
 /* GLUT font sub-API */
-#define STRING_TO_FONT_ENTRY(s, font)	(strcmp(s, # font)==0)? font : 
+#define STRING_TO_FONT_ENTRY(s, font)	(strcmp(s, # font)==0)? font :
 
 #define STRING_TO_FONT(L, s)	\
 	STRING_TO_FONT_ENTRY(s, GLUT_STROKE_ROMAN)		\

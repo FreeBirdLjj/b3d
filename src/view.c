@@ -1,7 +1,4 @@
-#include "globals.h"
-#include "utils.h"
 #include "view.h"
-#include "my_lua.h"
 
 #ifdef DEBUG
 #define FPS
@@ -134,7 +131,7 @@ void keyboard_up(unsigned char key, int xi, int yi){
 }
 
 void reshape(int w, int h){
-	glViewport(0, 0, max(w, 1), max(h, 1));
+	glViewport(0, 0, MAX(w, 1), MAX(h, 1));
 }
 
 void menu_callback(int option){

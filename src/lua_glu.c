@@ -1,8 +1,6 @@
-#include "my_lua.h"
-#include <GL/glut.h>
-#include "lua_bind.h"
+#include "lua_glu.h"
 
-BIND_1_1(string, gluErrorString, int) 
+BIND_1_1(string, gluErrorString, int)
 
 BIND_1_1(string, gluGetString, int)
 
@@ -29,11 +27,14 @@ BIND_0_4(gluPerspective, number, number, number, number)
 int l_gluPickMatrix(lua_State *L){
 	int i;
 	GLint viewport[4];
-	if(lua_gettop(L)==8)
-		for(i = 0; i<4; i++)
+	if(lua_gettop(L)==8){
+		for(i = 0; i<4; i++){
 			viewport[i] = luaL_checkint(L, i+5);
-	else
+		}
+	}
+	else{
 		glGetIntegerv(GL_VIEWPORT,viewport);
+	}
 	gluPickMatrix(
 		luaL_checknumber(L, 1),
 		luaL_checknumber(L, 2),
@@ -52,8 +53,9 @@ int l_gluProject(lua_State *L){
 	glGetDoublev(GL_MODELVIEW_MATRIX, model);
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	if(!gluProject(luaL_checknumber(L, 1),	luaL_checknumber(L, 2),	luaL_checknumber(L, 3),	model, proj, viewport, &x, &y, &z))
+	if(!gluProject(luaL_checknumber(L, 1),	luaL_checknumber(L, 2),	luaL_checknumber(L, 3),	model, proj, viewport, &x, &y, &z)){
 		luaL_error(L, "gluProject() failed");
+	}
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
 	lua_pushnumber(L, z);
@@ -68,8 +70,9 @@ int l_gluUnProject(lua_State *L){
 	glGetDoublev(GL_MODELVIEW_MATRIX, model);
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	if(!gluUnProject(luaL_checknumber(L, 1), luaL_checknumber(L, 2), luaL_checknumber(L, 3), model, proj, viewport, &x, &y, &z))
+	if(!gluUnProject(luaL_checknumber(L, 1), luaL_checknumber(L, 2), luaL_checknumber(L, 3), model, proj, viewport, &x, &y, &z)){
 		luaL_error(L, "gluUnProject() failed");
+	}
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
 	lua_pushnumber(L, z);

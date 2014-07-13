@@ -1,5 +1,4 @@
 #include "utils.h"
-#include <GL/glut.h>
 
 void unpack_color(GLuint color, float *r, float *g, float *b, float *a){
 	GLubyte *t = (GLubyte *)&color;

@@ -1,14 +1,6 @@
 /* Large hunks of code here have been lifted from /usr/share/libpng/example.c */
 
-#include <stdio.h>
-#include <jpeglib.h>
-#include <setjmp.h>
-
-#include "my_lua.h"
 #include "image.h"
-#include <GL/glut.h>
-#include <stdlib.h>
-#include <assert.h>
 
 unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, int *height);
 static image_t *checkimage(lua_State *L);
@@ -18,7 +10,7 @@ int l_image_load(lua_State *L){
 	image_t *img = (image_t *)lua_newuserdata(L, sizeof(image_t));
 
 	/* Set the metatable of the image. */
-	luaL_getmetatable(L, "brainmaps_image");  
+	luaL_getmetatable(L, "brainmaps_image");
 	lua_setmetatable(L, -2);
 
 	img->pixels = read_JPEG_file(L, filename, &img->nx, &img->ny);
@@ -95,7 +87,7 @@ int lua_openimage(lua_State *L){
 /* The code below this line derived from example.c in the jpeglib source
  * distribution.  -ijt
  */
- 
+
 
 
 /*
@@ -106,7 +98,7 @@ int lua_openimage(lua_State *L){
  * conjunction with the documentation file libjpeg.doc.
  *
  * This code will not do anything useful as-is, but it may be helpful as a
- * skeleton for constructing routines that call the JPEG library.  
+ * skeleton for constructing routines that call the JPEG library.
  *
  * We present these routines in the same coding style used in the JPEG code
  * (ANSI function definitions, etc); but you are of course free to code your
@@ -259,7 +251,7 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 	 * output image dimensions available, as well as the output colormap
 	 * if we asked for color quantization.
 	 * In this example, we need to make an output work buffer of the right size.
-	 */ 
+	 */
 	/* JSAMPLEs per row in output buffer */
 	row_stride = cinfo.output_width*cinfo.output_components;
 	/* Make a one-row-high sample array that will go away when done with image */
@@ -342,4 +334,4 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
  * On some systems you may need to set up a signal handler to ensure that
  * temporary files are deleted if the program is interrupted.  See libjpeg.doc.
  */
- 
+

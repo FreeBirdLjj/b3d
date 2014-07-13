@@ -1,8 +1,19 @@
-#ifndef BRAINMAPS_IMAGE_INCLUDED
-#define BRAINMAPS_IMAGE_INCLUDED
+#ifndef __B3D_IMAGE_H__
+#define __B3D_IMAGE_H__
 
-#include <lua.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <setjmp.h>
+#include <assert.h>
+#include <lua.h>
+#include <jpeglib.h>
+
+#include "my_lua.h"
 
 /* rgba image type */
 typedef struct{
@@ -15,4 +26,3 @@ typedef struct{
 int lua_openimage(lua_State *L);
 
 #endif
-
