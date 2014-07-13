@@ -112,6 +112,12 @@ int file_exists(char filename[]){
 	return 1;
 }
 
+char *get_current_dir(void){
+	char *buf = (char *)malloc(80);
+	getcwd(buf, 80);
+	return buf;
+}
+
 /* based on http://www.lua.org/pil/24.1.html */
 /* Global inputs: config_filename, init_filename */
 /* Global outputs: lua_state */
@@ -134,7 +140,7 @@ void brainmaps_start_lua(void){
 	l_reset_menu(lua_state);
 
 	/* Search up the directory tree for a while to find the init script. */
-	while(strcmp(get_current_dir_name(), "/"))
+	while(strcmp(get_current_dir(), "/"))
 		if(file_exists(init_filename))
 			if((luaL_loadfile(lua_state, init_filename))||lua_pcall(lua_state, 0, 0, 0)){
 				fprintf(stderr, "Fatal error: The init file did not run: %s\n", lua_tostring(lua_state, -1));
