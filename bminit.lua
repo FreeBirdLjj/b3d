@@ -385,16 +385,13 @@ on_display = function()
 	-- smarter.
 	if(x^2+y^2+z^2<(0.75*zfar)^2) then
 		str = string.format("Mouse location: (%4.3f, %4.3f, %4.3f)", x, y, z)
-	end
-
-	if(str) then
 		glRasterPos(10, h-20)
 		draw_bitmap_string("8x13", str)
 	end
 
 	-- More here: print out other info of interest: frame rate, etc.
-	glRasterPos(10, 10)
 	if(kb_cmd_mode) then
+		glRasterPos(10, 10)
 		draw_bitmap_string("8x13", "lua> " .. command .. "|")
 	end
 	glPopMatrix()
@@ -552,10 +549,8 @@ local toggle_transparency = function()
 	doing_transparency = not(doing_transparency)
 	if(doing_transparency) then
 		mesh_color[4] = 0.5
-		glDisable(GL_DEPTH_TEST)
 	else
 		mesh_color[4] = 1.0
-		glEnable(GL_DEPTH_TEST)
 	end
 end
 
@@ -658,7 +653,6 @@ end
 local toggle_full_screen =  (function()
 	local fullscreen = false
 	local last_width, last_height
-		= 0, 0
 	return function()
 		fullscreen = not(fullscreen)
 		if(fullscreen) then
