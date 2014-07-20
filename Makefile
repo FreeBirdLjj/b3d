@@ -18,7 +18,7 @@ GLLIBS := -lglut -lGL -lGLU
 endif
 
 CPPFLAGS = -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR)
-CFLAGS = -g -O3
+CFLAGS ?= -g -O3
 LOADLIBES = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs
 LDLIBS = -llua -ldl -lm -ljpeg $(GLLIBS)
 
@@ -29,7 +29,7 @@ BIN = bin/b3d
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
 $(LIBLUA):
-	cd $(LIBLUA_DIR)/src/ && make $(LUA_TARGET)
+	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET)
 
 $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && make
