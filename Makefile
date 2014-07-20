@@ -1,6 +1,9 @@
-JPEG_VER = 9a
-LIBJPEG_DIR = jpeg-$(JPEG_VER)
+LIBJPEG_VER = 9a
+LIBJPEG_DIR = jpeg-$(LIBJPEG_VER)
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
+LIBREADLINE_VER = 6.3
+LIBREADLINE_DIR = readline-$(LIBREADLINE_VER)
+LIBREADLINE = $(LIBREADLINE_DIR)/libreadline.a
 LIBLUA_VER = 5.2.3
 LIBLUA_DIR = lua-$(LIBLUA_VER)
 LIBLUA = $(LIBLUA_DIR)/src/liblua.a
@@ -29,7 +32,7 @@ BIN = bin/b3d
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
 $(LIBLUA):
-	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET)
+	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I../$(LIBREADLINE_DIR) LOADLIBES=-L$(LIBREADLINE_DIR) LDLIBS=-lreadline
 
 $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && make
