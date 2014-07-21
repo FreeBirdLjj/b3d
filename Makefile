@@ -31,7 +31,7 @@ BIN = bin/b3d
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
 $(LIBREADLINE):
-	cd $(LIBREADLINE_DIR) && ./configure --disable-shared && $(MAKE) static
+	cd $(LIBREADLINE_DIR) && ./configure --disable-shared && $(MAKE) static libreadline.a
 
 $(LIBLUA): $(LIBREADLINE)
 	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I$(PWD) MYLDFLAGS=-L$(LIBREADLINE_DIR) MYLIBS=-ltermcap a
