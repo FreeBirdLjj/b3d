@@ -2,6 +2,8 @@
 .DS_Store
 *.swp
 *.[ao]
+*.so
+*.so.*
 *.l[ao]
 *.out
 *.tar.xz
@@ -20,7 +22,15 @@ jpeg-9a/rdjpgcom
 jpeg-9a/wrjpgcom
 jpeg-9a/.deps
 jpeg-9a/.libs
+readline/Makefile
+readline/config.h
+readline/config.log
+readline/config.status
+readline/doc/Makefile
+readline/examples/Makefile
+readline/shlib/Makefile
+readline/stamp-h
 lua-5.2.3/src/lua
 lua-5.2.3/src/luac
-bin/*
+bin/
 labels.txt
