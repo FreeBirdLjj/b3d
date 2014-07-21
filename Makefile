@@ -36,7 +36,7 @@ $(LIBREADLINE):
 	cd $(LIBREADLINE_DIR) && ./configure --disable-shared && $(MAKE) static
 
 $(LIBLUA): $(LIBREADLINE)
-	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I$(PWD) MYLDFLAGS=-L$(LIBREADLINE_DIR) MYLDLIBS=-lhistory
+	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I$(PWD) MYLDFLAGS=-L$(LIBREADLINE_DIR) MYLIBS=-ltermcap a
 
 $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && $(MAKE)
