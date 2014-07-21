@@ -1,12 +1,10 @@
 PWD = $(shell pwd)
 
-LIBJPEG_VER = 9a
-LIBJPEG_DIR = $(PWD)/jpeg-$(LIBJPEG_VER)
+LIBJPEG_DIR = $(PWD)/jpeg
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
 LIBREADLINE_DIR = $(PWD)/readline
 LIBREADLINE = $(LIBREADLINE_DIR)/libreadline.a
-LIBLUA_VER = 5.2.3
-LIBLUA_DIR = $(PWD)/lua-$(LIBLUA_VER)
+LIBLUA_DIR = $(PWD)/lua
 LIBLUA = $(LIBLUA_DIR)/src/liblua.a
 
 OS_NAME = $(shell uname)
