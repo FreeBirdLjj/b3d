@@ -1,11 +1,10 @@
-LIBJPEG_VER = 9a
-LIBJPEG_DIR = jpeg-$(LIBJPEG_VER)
+PWD = $(shell pwd)
+
+LIBJPEG_DIR = $(PWD)/jpeg
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
-LIBREADLINE_VER = 6.3
-LIBREADLINE_DIR = readline-$(LIBREADLINE_VER)
+LIBREADLINE_DIR = $(PWD)/readline
 LIBREADLINE = $(LIBREADLINE_DIR)/libreadline.a
-LIBLUA_VER = 5.2.3
-LIBLUA_DIR = lua-$(LIBLUA_VER)
+LIBLUA_DIR = $(PWD)/lua
 LIBLUA = $(LIBLUA_DIR)/src/liblua.a
 
 OS_NAME = $(shell uname)
@@ -31,15 +30,18 @@ BIN = bin/b3d
 
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
-$(LIBLUA):
-	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I../$(LIBREADLINE_DIR) LOADLIBES=-L$(LIBREADLINE_DIR) LDLIBS=-lreadline
+$(LIBREADLINE):
+	cd $(LIBREADLINE_DIR) && ./configure --disable-shared && $(MAKE) static libreadline.a
+
+$(LIBLUA): $(LIBREADLINE)
+	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I$(PWD) MYLDFLAGS=-L$(LIBREADLINE_DIR) MYLIBS=-ltermcap a
 
 $(LIBJPEG):
-	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && make
+	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && $(MAKE)
 
 $(BIN): src/main.o src/mesh.o src/view.o src/my_lua.o src/utils.o src/globals.o src/lua_gl.o src/lua_glu.o src/lua_glut.o src/image.o
 	mkdir -p bin/
 	$(CC) $(CPPFLAGSLGS) $(CFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
 
 clean:
-	-rm -fr src/*.o $(BIN)
+	$(RM) -r src/*.o bin/
