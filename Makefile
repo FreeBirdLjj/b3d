@@ -1,10 +1,10 @@
-PWD = $(shell pwd)
+LIB_DIR = $(shell pwd)/lib
 
-LIBJPEG_DIR = $(PWD)/jpeg
+LIBJPEG_DIR = $(LIB_DIR)/jpeg
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
-LIBREADLINE_DIR = $(PWD)/readline
+LIBREADLINE_DIR = $(LIB_DIR)/readline
 LIBREADLINE = $(LIBREADLINE_DIR)/libreadline.a
-LIBLUA_DIR = $(PWD)/lua
+LIBLUA_DIR = $(LIB_DIR)/lua
 LIBLUA = $(LIBLUA_DIR)/src/liblua.a
 
 OS_NAME = $(shell uname)
@@ -34,7 +34,7 @@ $(LIBREADLINE):
 	cd $(LIBREADLINE_DIR) && ./configure --disable-shared && $(MAKE) static libreadline.a
 
 $(LIBLUA): $(LIBREADLINE)
-	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I$(PWD) MYLDFLAGS=-L$(LIBREADLINE_DIR) MYLIBS=-ltermcap a
+	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I$(LIB_DIR) MYLDFLAGS=-L$(LIBREADLINE_DIR) MYLIBS=-ltermcap a
 
 $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && $(MAKE)
