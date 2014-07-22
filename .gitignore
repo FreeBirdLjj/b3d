@@ -11,30 +11,30 @@
 *.Plo
 tags
 
-jpeg/config.log
-jpeg/config.status
-jpeg/jconfig.h
-jpeg/libtool
-jpeg/Makefile
-jpeg/stamp-h1
-jpeg/[cd]jpeg
-jpeg/jpegtran
-jpeg/rdjpgcom
-jpeg/wrjpgcom
-jpeg/.deps
-jpeg/.libs
+lib/jpeg/config.log
+lib/jpeg/config.status
+lib/jpeg/jconfig.h
+lib/jpeg/libtool
+lib/jpeg/Makefile
+lib/jpeg/stamp-h1
+lib/jpeg/[cd]jpeg
+lib/jpeg/jpegtran
+lib/jpeg/rdjpgcom
+lib/jpeg/wrjpgcom
+lib/jpeg/.deps
+lib/jpeg/.libs
 
-readline/Makefile
-readline/config.h
-readline/config.log
-readline/config.status
-readline/doc/Makefile
-readline/examples/Makefile
-readline/shlib/Makefile
-readline/stamp-h
+lib/readline/Makefile
+lib/readline/config.h
+lib/readline/config.log
+lib/readline/config.status
+lib/readline/doc/Makefile
+lib/readline/examples/Makefile
+lib/readline/shlib/Makefile
+lib/readline/stamp-h
 
-lua/src/lua
-lua/src/luac
+lib/lua/src/lua
+lib/lua/src/luac
 
 bin/
 
