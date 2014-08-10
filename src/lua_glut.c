@@ -122,11 +122,11 @@ BIND_1_1(number, glutLayerGet, int)
 	STRING_TO_FONT_ENTRY(s, GLUT_BITMAP_HELVETICA_18)	\
 	(strcmp(s, "9x15")==0)? GLUT_BITMAP_9_BY_15 :		\
 	(strcmp(s, "8x13")==0)? GLUT_BITMAP_8_BY_13 :		\
-	(strcmp(s, "t10")==0)? GLUT_BITMAP_TIMES_ROMAN_10 :	\
-	(strcmp(s, "t24")==0)? GLUT_BITMAP_TIMES_ROMAN_24 :	\
-	(strcmp(s, "h10")==0)? GLUT_BITMAP_HELVETICA_10 :	\
-	(strcmp(s, "h12")==0)? GLUT_BITMAP_HELVETICA_12 :	\
-	(strcmp(s, "h18")==0)? GLUT_BITMAP_HELVETICA_18 :	\
+	(strcmp(s, "t10")==0)?  GLUT_BITMAP_TIMES_ROMAN_10 :	\
+	(strcmp(s, "t24")==0)?  GLUT_BITMAP_TIMES_ROMAN_24 :	\
+	(strcmp(s, "h10")==0)?  GLUT_BITMAP_HELVETICA_10 :	\
+	(strcmp(s, "h12")==0)?  GLUT_BITMAP_HELVETICA_12 :	\
+	(strcmp(s, "h18")==0)?  GLUT_BITMAP_HELVETICA_18 :	\
 	(luaL_error(L, "Unrecognized font: %s", s), /* ignored */GLUT_BITMAP_HELVETICA_18)
 
 int l_glutBitmapCharacter(lua_State *L){

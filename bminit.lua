@@ -36,6 +36,7 @@ local glEnd = gl.glEnd
 local glEndList = gl.glEndList
 local glFlush = gl.glFlush
 local glGenLists = gl.glGenLists
+local glGetBooleanv = gl.glGetBooleanv
 local glGetDoublev = gl.glGetDoublev
 local glLoadIdentity = gl.glLoadIdentity
 local glMaterial = gl.glMaterial
@@ -79,6 +80,10 @@ local sin = math.sin
 local sqrt = math.sqrt
 
 local unpack = unpack
+
+-- Boolean values
+local GL_FALSE			= 0x0000
+local GL_TRUE			= 0x0001
 
 -- Data types
 local GL_FLOAT			= 0x1406
@@ -398,7 +403,7 @@ on_display = function()
 	glMatrixMode(GL_MODELVIEW)
 	glPopMatrix()
 
-	if(glGetDoublev(GL_DEPTH_TEST)==1) then
+	if(glGetBooleanv(GL_DEPTH_TEST)==GL_TRUE) then
 		glEnable(GL_DEPTH_TEST)
 	end
 
@@ -407,7 +412,7 @@ on_display = function()
 
 		for _, L in pairs(labels) do
 			x, y, z, s = unpack(L)
-			draw_bitmap_string(GLUT_BITMAP_HELVETICA_12, s, x, y, z)
+			draw_bitmap_string("h12", s, x, y, z)
 		end
 
 		glPointSize(label_point_size)
