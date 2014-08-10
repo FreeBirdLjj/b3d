@@ -388,11 +388,26 @@ BIND_1_1(number, glIsEnabled, int)
 int l_glGetDoublev(lua_State *L){
 	GLdouble params[32];
 	int i;
+
 	for(i = 0; i<32; i++)
 		params[i] = DBL_MAX;
 	glGetDoublev(luaL_checkint(L, 1), params);
 	for(i = 0; (i<32)&&(params[i]!=DBL_MAX); i++)
 		lua_pushnumber(L, params[i]);
+	return i;
+}
+
+int l_glGetBooleanv(lua_State *L){
+	GLboolean params[32];
+	int i;
+
+	for(i = 0; i<32; i++){
+		params[i] = ~0;
+	}
+	glGetBooleanv(luaL_checkint(L, 1), params);
+	for(i = 0; (i<32)&&(params[i]!=(~0)); i++){
+		lua_pushnumber(L, params[i]);
+	}
 	return i;
 }
 
@@ -699,6 +714,7 @@ static const struct luaL_Reg gl_lib[] = {
 	ENTRY(glScissor),
 	ENTRY(glIsEnabled),
 	ENTRY(glGetDoublev),
+	ENTRY(glGetBooleanv),
 	ENTRY(glPushAttrib),
 	ENTRY(glPopAttrib),
 	ENTRY(glPushClientAttrib),
