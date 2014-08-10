@@ -1,5 +1,4 @@
-LIB_DIR = $(shell pwd)/lib
-
+LIB_DIR = lib
 LIBJPEG_DIR = $(LIB_DIR)/jpeg
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
 LIBREADLINE_DIR = $(LIB_DIR)/readline
@@ -30,11 +29,8 @@ BIN = bin/b3d
 
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
-$(LIBREADLINE):
-	cd $(LIBREADLINE_DIR) && ./configure --disable-shared && $(MAKE) static libreadline.a
-
-$(LIBLUA): $(LIBREADLINE)
-	$(MAKE) -C $(LIBLUA_DIR)/src/ $(LUA_TARGET) CPPFLAGS=-I$(LIB_DIR) MYLDFLAGS=-L$(LIBREADLINE_DIR) MYLIBS=-ltermcap a
+$(LIBLUA):
+	cd $(LIBLUA_DIR); make linux
 
 $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && $(MAKE)
