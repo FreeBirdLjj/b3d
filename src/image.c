@@ -22,21 +22,27 @@ int l_image_load(lua_State *L){
 
 static image_t *checkimage(lua_State *L){
 	image_t *img = (image_t *)luaL_checkudata(L, 1, "brainmaps_image");
+
 	luaL_argcheck(L, img!=NULL, 1, "`image' expected");
+	
 	return img;
 }
 
 static int l_image_draw_pixels(lua_State *L){
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	image_t *im = checkimage(L);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glDrawPixels(im->nx, im->ny, GL_RGBA, GL_UNSIGNED_BYTE, im->pixels);
+
 	return 0;
 }
 
 static int l_image_get_size(lua_State *L){
 	image_t *im = checkimage(L);
+
 	lua_pushnumber(L, im->nx);
 	lua_pushnumber(L, im->ny);
+	
 	return 2;
 }
 
@@ -55,12 +61,15 @@ static const struct luaL_Reg imagelib_m[] = {
 
 static int image_gc(lua_State *L){
 	image_t *im = checkimage(L);
+
 	fprintf(stderr, "Freeing image %p\n", im);
 	if(im){
-		if(im->texture_is_valid)
+		if(im->texture_is_valid){
 			glDeleteTextures(1, &im->gl_texture_name);
+		}
 		free(im->pixels);
 	}
+	
 	return 0;
 }
 
@@ -81,6 +90,7 @@ int lua_openimage(lua_State *L){
 
 	luaL_setfuncs(L, imagelib_m, 0);
 	luaL_newlib(L, imagelib_f);
+
 	return 1;
 }
 
@@ -146,9 +156,8 @@ int lua_openimage(lua_State *L){
  */
 
 struct my_error_mgr{
-	struct jpeg_error_mgr pub;	/* "public" fields */
-
-	jmp_buf setjmp_buffer;		/* for return to caller */
+	struct jpeg_error_mgr pub;				/* "public" fields */
+	jmp_buf setjmp_buffer;					/* for return to caller */
 };
 
 typedef struct my_error_mgr *my_error_ptr;
@@ -197,7 +206,8 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 	 * requires it in order to read binary files.
 	 */
 
-	if(!(infile = fopen(filename, "rb"))){
+	infile = fopen(filename, "rb");
+	if(!infile){
 		luaL_error(L, "Could not open %s.\n", filename);
 		return NULL;
 	}
@@ -264,9 +274,10 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 	 * loop counter, so that we don't have to keep track ourselves.
 	 */
 	int w, h, xi, yi;
+
 	*width = w = cinfo.output_width;
 	*height = h = cinfo.output_height;
-	unsigned char *ret = malloc((w*h)<<2);
+	unsigned char *ret = (unsigned char *)malloc((w*h)*sizeof(unsigned int));
 	if(cinfo.out_color_components!=3){
 		luaL_error(L, "Only three-channel images are supported. %s has %i.\n", filename, cinfo.out_color_components);
 		return NULL;
@@ -279,8 +290,9 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 		JSAMPLE *pixelrow = buffer[0];
 		assert((int)cinfo.output_scanline==yi);
 		jpeg_read_scanlines(&cinfo, buffer, 1);
-		for(xi = 0; xi<w; xi++)
+		for(xi = 0; xi<w; xi++){
 			((unsigned int *)ret)[xi+w*yi] = (*((unsigned int *)&pixelrow[xi*3]))|0xFF000000;
+		}
 	}
 
 	/* Step 7: Finish decompression */

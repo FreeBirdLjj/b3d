@@ -7,14 +7,17 @@ int l_glutInit(lua_State *L){
 	int i;
 	int argc = lua_gettop(L), saved_argc = lua_gettop(L);
 	char **argv = (char **)calloc(argc+1, sizeof(char *));
+
 	for(i = 0; i<argc; i++){
 		argv[i] = strdup(luaL_checkstring(L, i+1));
 	}
 	glutInit(&argc, argv);
+	
 	for(i = 0; i<saved_argc; i++){
 		free(argv[i]);
 	}
 	free(argv);
+	
 	return 0;
 }
 
@@ -39,6 +42,7 @@ int l_glutCreateSubWindow(lua_State *L){
 			luaL_checkint(L, 5)
 		)
 	);
+
 	return 1;
 }
 
@@ -130,28 +134,40 @@ BIND_1_1(number, glutLayerGet, int)
 	(luaL_error(L, "Unrecognized font: %s", s), /* ignored */GLUT_BITMAP_HELVETICA_18)
 
 int l_glutBitmapCharacter(lua_State *L){
-	glutBitmapCharacter(STRING_TO_FONT(L, luaL_checkstring(L, 1)), luaL_checkint(L, 2));
+	const char *font_name = luaL_checkstring(L, 1);
+
+	glutBitmapCharacter(STRING_TO_FONT(L, font_name), luaL_checkint(L, 2));
+
 	return 0;
 }
 
 int l_glutBitmapWidth(lua_State *L){
+	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
+
 	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutBitmapWidth must be a string of length 1.");
-	glutBitmapWidth(STRING_TO_FONT(L, luaL_checkstring(L, 1)), (int)c[0]);
+	glutBitmapWidth(STRING_TO_FONT(L, font_name), (int)c[0]);
+	
 	return 0;
 }
 
 int l_glutStrokeCharacter(lua_State *L){
+	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
+	
 	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutStrokeCharacter must be a string of length 1.");
-	glutStrokeCharacter(STRING_TO_FONT(L, luaL_checkstring(L, 1)), (int)c[0]);
+	glutStrokeCharacter(STRING_TO_FONT(L, font_name), (int)c[0]);
+	
 	return 0;
 }
 
 int l_glutStrokeWidth(lua_State *L){
+	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
+	
 	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutStrokeWidth must be a string of length 1.");
-	glutStrokeWidth(STRING_TO_FONT(L, luaL_checkstring(L, 1)), (int)c[0]);
+	glutStrokeWidth(STRING_TO_FONT(L, font_name), (int)c[0]);
+	
 	return 0;
 }
 
@@ -327,6 +343,7 @@ static const struct luaL_Reg glut_lib[] = {
 
 int luaopen_glut(lua_State *L){
 	luaL_newlib(L, glut_lib);
+	
 	return 1;
 }
 

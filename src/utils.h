@@ -16,6 +16,6 @@
 #define MAX(a, b)	({ typeof(a) _a = a; typeof(b) _b = b; _a>_b? _a : _b; })
 #endif
 
-void unpack_color(GLuint color, float *r, float *g, float *b, float *a);
+void unpack_color(GLuint color, GLfloat *r, GLfloat *g, GLfloat *b, GLfloat *a);
 
 #endif

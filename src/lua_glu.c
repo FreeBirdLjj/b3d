@@ -27,6 +27,7 @@ BIND_0_4(gluPerspective, number, number, number, number)
 int l_gluPickMatrix(lua_State *L){
 	int i;
 	GLint viewport[4];
+
 	if(lua_gettop(L)==8){
 		for(i = 0; i<4; i++){
 			viewport[i] = luaL_checkint(L, i+5);
@@ -42,6 +43,7 @@ int l_gluPickMatrix(lua_State *L){
 		luaL_checknumber(L, 4),
 		viewport
 	);
+	
 	return 0;
 }
 
@@ -56,9 +58,11 @@ int l_gluProject(lua_State *L){
 	if(!gluProject(luaL_checknumber(L, 1),	luaL_checknumber(L, 2),	luaL_checknumber(L, 3),	model, proj, viewport, &x, &y, &z)){
 		luaL_error(L, "gluProject() failed");
 	}
+
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
 	lua_pushnumber(L, z);
+
 	return 3;
 }
 
@@ -73,9 +77,11 @@ int l_gluUnProject(lua_State *L){
 	if(!gluUnProject(luaL_checknumber(L, 1), luaL_checknumber(L, 2), luaL_checknumber(L, 3), model, proj, viewport, &x, &y, &z)){
 		luaL_error(L, "gluUnProject() failed");
 	}
+
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
 	lua_pushnumber(L, z);
+	
 	return 3;
 }
 

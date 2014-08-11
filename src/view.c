@@ -26,8 +26,9 @@ void display(void){
 			lua_setglobal(lua_state, "on_display");
 		}
 	}
-	else
+	else{
 		lua_pop(lua_state, 1);
+	}
 #ifdef FPS
 	fps++;
 #endif
@@ -46,8 +47,9 @@ void mouse(int button, int state, int xi, int yi){
 			fprintf(stderr, "Warning: %s\n", msg);
 		}
 	}
-	else
+	else{
 		lua_pop(lua_state, 1);
+	}
 }
 
 void motion(int xi, int yi){
@@ -61,8 +63,9 @@ void motion(int xi, int yi){
 			fprintf(stderr, "Warning: %s\n", msg);
 		}
 	}
-	else
+	else{
 		lua_pop(lua_state, 1);
+	}
 }
 
 void passive_motion(int xi, int yi){
@@ -76,8 +79,9 @@ void passive_motion(int xi, int yi){
 			fprintf(stderr, "Warning: %s\n", msg);
 		}
 	}
-	else
+	else{
 		lua_pop(lua_state, 1);
+	}
 }
 
 void idle(void){
@@ -94,8 +98,9 @@ void idle(void){
 		}
 		glutPostRedisplay();
 	}
-	else
+	else{
 		lua_pop(lua_state, 1);
+	}
 }
 
 void keyboard(unsigned char key, int xi, int yi){
@@ -110,8 +115,9 @@ void keyboard(unsigned char key, int xi, int yi){
 			fprintf(stderr, "Warning: %s\n", msg);
 		}
 	}
-	else
+	else{
 		lua_pop(lua_state, 1);
+	}
 }
 
 void keyboard_up(unsigned char key, int xi, int yi){
@@ -126,8 +132,9 @@ void keyboard_up(unsigned char key, int xi, int yi){
 			fprintf(stderr, "Warning: %s\n", msg);
 		}
 	}
-	else
+	else{
 		lua_pop(lua_state, 1);
+	}
 }
 
 void reshape(int w, int h){
@@ -147,8 +154,9 @@ void menu_callback(int option){
 		glutPostRedisplay();
 	}
 	else{
-		if(!lua_isnil(lua_state, -1))
+		if(!lua_isnil(lua_state, -1)){
 			fprintf(stderr, "Warning: menu callback is neither a function nor nil.\n");
+		}
 		lua_pop(lua_state, 1);
 	}
 }
@@ -185,13 +193,15 @@ void view(char *title){
 
 
 int l_set_idle_callback(lua_State *L){
-	if(lua_isnil(L, 1))
+	if(lua_isnil(L, 1)){
 		glutIdleFunc(NULL);
+	}
 	else{
 		luaL_checktype(L, 1, LUA_TFUNCTION);
 		lua_setglobal(L, "on_idle");
 		glutIdleFunc(idle);
 	}
+	
 	return 0;
 }
 

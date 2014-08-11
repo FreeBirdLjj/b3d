@@ -4,6 +4,7 @@
 
 int l_warn(lua_State *L){
 	fprintf(stderr, "Warning: %s\n", luaL_checkstring(L, 1));
+
 	return 0;
 }
 
@@ -14,11 +15,13 @@ int l_reset_menu(lua_State *L){
 	}
 	glutCreateMenu(menu_callback);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
+
 	return 0;
 }
 
 int l_add_menu_item(lua_State *L){
 	static int index = 0;
+
 	luaL_checktype(L, 2, LUA_TFUNCTION);
 
 	/* Add the callback function to the menu_callbacks table,
@@ -32,18 +35,22 @@ int l_add_menu_item(lua_State *L){
 	lua_settable(L, -3);
 
 	glutAddMenuEntry(luaL_checkstring(L, 1), index);
+	
 	lua_pushnumber(L, index++);
+	
 	return 1;
 }
 
 int l_get_gl_area_size(lua_State *L){
 	lua_pushnumber(L, glutGet(GLUT_WINDOW_WIDTH));
 	lua_pushnumber(L, glutGet(GLUT_WINDOW_HEIGHT));
+	
 	return 2;
 }
 
 int l_os(lua_State *L){
 	lua_pushstring(L, "gnu");
+
 	return 1;
 }
 
@@ -52,6 +59,7 @@ int l_os(lua_State *L){
 int l_run_process_in_background(lua_State *L){
 	char *command_line = strdup(luaL_checkstring(L, 1));
 	int len = strlen(command_line);
+
 	/* Append the background symbol '&' if it is not already at the end of the
 	 * string. */
 	if(command_line[len-1]!='&'){
@@ -60,15 +68,20 @@ int l_run_process_in_background(lua_State *L){
 		command_line[len+1] = '\0';
 	}
 	system(command_line);
+
 	free(command_line);
+	
 	return 0;
 }
 
 int l_get_filename(lua_State *L){
 	char buf[4*80];
+
 	printf("Please enter a filename: ");
 	fgets(buf, sizeof(buf), stdin);
+	
 	lua_pushstring(L, buf);
+	
 	return 1;
 }
 
@@ -106,15 +119,20 @@ static const luaL_Reg lualibs[] = {
 
 int file_exists(char filename[]){
 	FILE *file = fopen(filename, "r");
-	if(!file)
+
+	if(!file){
 		return 0;
+	}
 	fclose(file);
+	
 	return 1;
 }
 
 char *get_current_dir(void){
 	char *buf = (char *)malloc(80);
+	
 	getcwd(buf, 80);
+	
 	return buf;
 }
 
@@ -123,7 +141,8 @@ char *get_current_dir(void){
 /* Global outputs: lua_state */
 void brainmaps_start_lua(void){
 
-	if(!(lua_state = luaL_newstate())){
+	lua_state = luaL_newstate();
+	if(!lua_state){
 		fprintf(stderr, "Fatal error: Could not start Lua interpreter.\n");
 		exit(-1);
 	}
@@ -132,25 +151,30 @@ void brainmaps_start_lua(void){
 	luaL_openlibs(lua_state);
 	const luaL_Reg *lib;
 	for(lib = lualibs; lib->func; lib++){
-		fprintf(stderr, "Loading lua lib: %s\n", lib->name);
+		if(verbosity){
+			fprintf(stderr, "Loading lua lib: %s\n", lib->name);
+		}
 		luaL_requiref(lua_state, lib->name, lib->func, 1);	/* open library */
-		lua_pop(lua_state, 1);	/* discard any results */
+		lua_pop(lua_state, 1);				/* discard any results */
 	}
 
 	l_reset_menu(lua_state);
 
 	/* Search up the directory tree for a while to find the init script. */
 	while(strcmp(get_current_dir(), "/"))
-		if(file_exists(init_filename))
+		if(file_exists(init_filename)){
 			if((luaL_loadfile(lua_state, init_filename))||lua_pcall(lua_state, 0, 0, 0)){
 				fprintf(stderr, "Fatal error: The init file did not run: %s\n", lua_tostring(lua_state, -1));
 				exit(-1);
 			}
-			else
+			else{
 				break;	/* The init file has successfully run.  Our search is over. */
+			}
+		}
 		else{
-			if(verbosity>=1)
+			if(verbosity){
 				fprintf(stderr,	"%s is not in the current directory.  Changing to parent directory.\n", init_filename);
+			}
 			chdir("..");
 		}
 }

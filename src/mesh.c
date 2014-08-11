@@ -1,9 +1,11 @@
 #include "mesh.h"
 
 int is_blank_line(char *s){
-	while(*s)
-		if(!isspace(*s++))
+	while(*s){
+		if(!isspace(*s++)){
 			return 0;
+		}
+	}
 	return 1;
 }
 
@@ -14,18 +16,22 @@ int get_line(char buf[], int bufsize, FILE *file){
 	return fgets(buf, bufsize, file)? ((buf[0]=='#')||is_blank_line(buf)? get_line(buf, bufsize, file) : 1) : 0;
 }
 
-float dot3(float a[3], float b[3]){
+float dot3(const GLfloat a[3], const GLfloat b[3]){
 	int i;
 	float s = 0.0f;
-	for(i = 0; i<3; i++)
+	
+	for(i = 0; i<3; i++){
 		s += a[i]*b[i];
+	}
+	
 	return s;
 }
 
-void calc_face_normal(mesh_t *mesh, float n[3], int fi){
+void calc_face_normal(mesh_t *mesh, GLfloat n[3], int fi){
 	int *t = mesh->tris[fi].iv;
 	int i;
-	float a[3], b[3];	/* first and second edge vectors */
+	GLfloat a[3], b[3];					/* first and second edge vectors */
+
 	for(i = 0; i<3; i++){
 		a[i] = mesh->verts[t[1]].p[i]-mesh->verts[t[0]].p[i];
 		b[i] = mesh->verts[t[2]].p[i]-mesh->verts[t[1]].p[i];
@@ -124,11 +130,13 @@ void mesh_draw(mesh_t *mesh){
 		for(i = 0; i<mesh->nv; i++){
 			float *n = mesh->verts[i].n;
 			float nlen2 = dot3(n, n);
+
 			if(nlen2==0.0f){
 				num_zero_normals++;
 			}
 			else{
 				float nlen = sqrtf(nlen2);
+
 				for(k = 0; k<3; k++){
 					n[k] /= nlen;
 				}
@@ -147,6 +155,7 @@ void mesh_draw(mesh_t *mesh){
 		float *n = &norms[i*3];
 		gl_triangle_t *glt = &gl_tris[i];
 		int *t = mesh->tris[i].iv;
+
 		if(normal_style==NS_FLAT){
 			calc_face_normal(mesh, n, i);
 		}
@@ -170,8 +179,10 @@ void mesh_draw(mesh_t *mesh){
 			}
 		}
 	}
-	if(verbosity>=1)
+	
+	if(verbosity){
 		fprintf(stderr, "Done.\n");
+	}
 
 	/* Send the data to OpenGL. */
 	glInterleavedArrays(GL_N3F_V3F, /* stride */ 0, gl_tris);
@@ -183,16 +194,21 @@ void mesh_draw(mesh_t *mesh){
 static mesh_t *checkmesh(lua_State *L){
 	mesh_t *m = (mesh_t *)luaL_checkudata(L, 1, "brainmaps_mesh");
 	luaL_argcheck(L, m!=NULL, 1, "`mesh' expected");
+
 	return m;
 }
 
 static int l_mesh_get_bounds(lua_State *L){
 	mesh_t *m = checkmesh(L);
 	int i;
-	for(i = 0; i<3; i++)
+
+	for(i = 0; i<3; i++){
 		lua_pushnumber(L, m->pmin[i]);
-	for(i = 0; i<3; i++)
+	}
+	for(i = 0; i<3; i++){
 		lua_pushnumber(L, m->pmax[i]);
+	}
+	
 	return 6;
 }
 
@@ -222,6 +238,7 @@ int mesh_load(mesh_t *mesh, FILE *file){
 
 	mesh->verts = (vertex_t *)malloc(mesh->nv*sizeof(vertex_t));
 	mesh->tris = (triangle_t *)malloc(mesh->nt*sizeof(triangle_t));
+
 	if((!mesh->verts)||(!mesh->tris)){
 		fprintf(stderr, "Memory allocation failed.\n");
 		return -1;
@@ -234,6 +251,7 @@ int mesh_load(mesh_t *mesh, FILE *file){
 		}
 
 		float *v = mesh->verts[i].p;
+
 		if(sscanf(buf, "%f %f %f", &v[0], &v[1], &v[2])!=3){
 			fprintf(stderr, "Expected three vertex indices but got %s on line %i\n", buf, line_num);
 		}
@@ -298,7 +316,9 @@ static int l_mesh_load(lua_State *L){
 
 static int l_mesh_draw(lua_State *L){
 	mesh_t *m = checkmesh(L);
+	
 	glCallList(m->gl_display_list);
+
 	return 0;
 }
 
@@ -319,14 +339,17 @@ static const struct luaL_Reg meshlib_m[] = {
 
 static int mesh_gc(lua_State *L){
 	mesh_t *m = checkmesh(L);
-	if(verbosity>=1){
+
+	if(verbosity){
 		fprintf(stderr, "Freeing mesh %p\n", m);
 	}
+	
 	if(m){
 		glDeleteLists(m->gl_display_list, 1);
 		free(m->verts);
 		free(m->tris);
 	}
+	
 	return 0;
 }
 
@@ -346,6 +369,7 @@ int luaopen_mesh(lua_State *L){
 
 	luaL_setfuncs(L, meshlib_m, 0);
 	luaL_newlib(L, meshlib_f);
+
 	return 1;
 }
 
