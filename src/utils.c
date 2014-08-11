@@ -1,10 +1,11 @@
 #include "utils.h"
 
-void unpack_color(GLuint color, float *r, float *g, float *b, float *a){
+void unpack_color(GLuint color, GLfloat *r, GLfloat *g, GLfloat *b, GLfloat *a){
 	GLubyte *t = (GLubyte *)&color;
-	*a = *t++/255.0f;
-	*b = *t++/255.0f;
-	*g = *t++/255.0f;
-	*r = *t/255.0f;
+
+	*r = t[3]/255.0f;
+	*g = t[2]/255.0f;
+	*b = t[1]/255.0f;
+	*a = t[0]/255.0f;
 }
 

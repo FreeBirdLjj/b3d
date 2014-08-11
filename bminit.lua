@@ -269,7 +269,7 @@ local draw_bitmap_string = function(font, s, x, y, z)
 end
 
 local show_pos = function(x, y, z)
-	draw_bitmap_string("8x13", string.format("(%3.1f, %3.1f, %3.1f) [mm]", x, y, z), x, y, z)
+	draw_bitmap_string("h12", string.format("(%3.1f, %3.1f, %3.1f) [mm]", x, y, z), x, y, z)
 end
 
 local draw_box_list = glGenLists(1)
@@ -391,13 +391,13 @@ on_display = function()
 	if(x^2+y^2+z^2<(0.75*zfar)^2) then
 		str = string.format("Mouse location: (%4.3f, %4.3f, %4.3f)", x, y, z)
 		glRasterPos(10, h-20)
-		draw_bitmap_string("8x13", str)
+		draw_bitmap_string("h12", str)
 	end
 
 	-- More here: print out other info of interest: frame rate, etc.
 	if(kb_cmd_mode) then
 		glRasterPos(10, 10)
-		draw_bitmap_string("8x13", "lua> " .. command .. "|")
+		draw_bitmap_string("h12", "lua> " .. command .. "|")
 	end
 	glPopMatrix()
 	glMatrixMode(GL_MODELVIEW)
