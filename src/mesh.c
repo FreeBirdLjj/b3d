@@ -112,6 +112,7 @@ void mesh_draw(mesh_t *mesh){
 					nlen = 1.0f;
 					break;
 				}
+
 				for(j = 0; j<3; j++){
 					n[j] /= nlen;
 				}
@@ -174,7 +175,7 @@ void mesh_draw(mesh_t *mesh){
 		for(j = 0; j<3; j++){
 			if(dot3(glt->vv[j].n, n)<0.0){
 				for(k = 0; k<3; k++){
-					glt->vv[j].n[k] = 0-glt->vv[j].n[k];
+					glt->vv[j].n[k] = -glt->vv[j].n[k];
 				}
 			}
 		}
@@ -189,6 +190,7 @@ void mesh_draw(mesh_t *mesh){
 	glDrawArrays(GL_TRIANGLES, 0, mesh->nt*3);
 
 	free(gl_tris);
+	free(norms);
 }
 
 static mesh_t *checkmesh(lua_State *L){
