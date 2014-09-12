@@ -39,6 +39,9 @@ $(BIN): src/main.o src/mesh.o src/view.o src/my_lua.o src/utils.o src/globals.o 
 	mkdir -p bin/
 	$(CC) $(CPPFLAGSLGS) $(CFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
 
+run: all
+	$(BIN)
+
 clean:
 	$(RM) -r src/*.o bin/
 
