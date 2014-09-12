@@ -23,7 +23,11 @@ CFLAGS ?= -O3
 LOADLIBES = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs
 LDLIBS = -llua -ldl -lm -ljpeg $(GLLIBS)
 
-BIN = bin/b3d
+SRC_DIR = src
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(SRCS:.c=.o)
+BIN_DIR = bin
+BIN = $(BIN_DIR)/b3d
 
 .PHONY: all clean distclean
 
@@ -35,7 +39,7 @@ $(LIBLUA):
 $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && $(MAKE)
 
-$(BIN): src/main.o src/mesh.o src/view.o src/my_lua.o src/utils.o src/globals.o src/lua_gl.o src/lua_glu.o src/lua_glut.o src/image.o
+$(BIN): $(OBJS)
 	mkdir -p bin/
 	$(CC) $(CPPFLAGSLGS) $(CFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
 
@@ -43,7 +47,7 @@ run: all
 	$(BIN)
 
 clean:
-	$(RM) -r src/*.o bin/
+	$(RM) -r $(OBJS) $(BIN_DIR)
 
 distclean: clean
 	cd $(LIBLUA_DIR); make clean
