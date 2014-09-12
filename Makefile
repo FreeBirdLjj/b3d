@@ -25,7 +25,7 @@ LDLIBS = -llua -ldl -lm -ljpeg $(GLLIBS)
 
 BIN = bin/b3d
 
-.PHONY: all clean
+.PHONY: all clean distclean
 
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
@@ -41,3 +41,7 @@ $(BIN): src/main.o src/mesh.o src/view.o src/my_lua.o src/utils.o src/globals.o 
 
 clean:
 	$(RM) -r src/*.o bin/
+
+distclean: clean
+	cd $(LIBLUA_DIR); make clean
+	cd $(LIBJPEG_DIR); make distclean
