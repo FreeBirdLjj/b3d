@@ -14,7 +14,15 @@
 		"variants": [
 		{
 			"name": "Run",
-			"cmd": ["${project_path:${folder}}/bin/b3d"],
+			"cmd": ["make", "run"],
+		},
+		{
+			"name": "clean",
+			"cmd": ["make", "clean"],
+		},
+		{
+			"name": "distclean",
+			"cmd": ["make", "distclean"],
 		}
 		]
 	}

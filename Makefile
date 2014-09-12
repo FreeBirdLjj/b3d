@@ -19,7 +19,7 @@ GLLIBS := -lglut -lGL -lGLU
 endif
 
 CPPFLAGS = -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR)
-CFLAGS ?= -g -O3
+CFLAGS ?= -O3
 LOADLIBES = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs
 LDLIBS = -llua -ldl -lm -ljpeg $(GLLIBS)
 
@@ -38,6 +38,9 @@ $(LIBJPEG):
 $(BIN): src/main.o src/mesh.o src/view.o src/my_lua.o src/utils.o src/globals.o src/lua_gl.o src/lua_glu.o src/lua_glut.o src/image.o
 	mkdir -p bin/
 	$(CC) $(CPPFLAGSLGS) $(CFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
+
+run: all
+	$(BIN)
 
 clean:
 	$(RM) -r src/*.o bin/
