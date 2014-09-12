@@ -19,7 +19,7 @@ GLLIBS := -lglut -lGL -lGLU
 endif
 
 CPPFLAGS = -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR)
-CFLAGS ?= -g -O3
+CFLAGS ?= -O3
 LOADLIBES = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs
 LDLIBS = -llua -ldl -lm -ljpeg $(GLLIBS)
 
