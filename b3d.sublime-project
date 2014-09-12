@@ -1,0 +1,22 @@
+{
+	"folders": [
+	{
+		"follow_symlinks": true,
+		"path": "."
+	}
+	],
+	"build_systems": [
+	{
+		"name": "b3d",
+		"cmd": ["make"],
+		"working_dir": "${project_path:${folder}}",
+
+		"variants": [
+		{
+			"name": "Run",
+			"cmd": ["${project_path:${folder}}/bin/b3d"],
+		}
+		]
+	}
+	]
+}
