@@ -34,7 +34,7 @@ BIN = $(BIN_DIR)/b3d
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
 $(LIBLUA):
-	cd $(LIBLUA_DIR); make linux
+	cd $(LIBLUA_DIR); make $(LUA_TARGET)
 
 $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && $(MAKE)
