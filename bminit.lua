@@ -570,12 +570,14 @@ local zoom_in = function()
 	if(max(abs(x1), abs(y1), abs(z1))<1e4) then
 		local x0, y0, z0 = unpack(camera_pivot)
 		local cam_off0 = camera_offset
-		local start = os.clock()
+		local cnt = 0
 		bm.set_idle_callback(function()
-			local t = os.clock()-start
-			if(t>=1.0) then
+		        cnt = cnt+1
+			if(cnt>60) then
 				bm.set_idle_callback(nil)
 			end
+
+			local t = cnt/60.0
 			-- This polynomial u(t) satisfies u(0)=0, u(1)=1,
 			-- u'(0)=0, u'(1)=0, so we get a smoother transition than
 			-- we would get by using a linear ramp.
@@ -670,7 +672,7 @@ local toggle_full_screen =  (function()
 end)()
 
 local quit = function()
-	os.exit(0)
+	os.exit(true)
 end
 
 local no_stripes = function()
