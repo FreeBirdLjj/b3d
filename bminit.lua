@@ -672,7 +672,7 @@ local toggle_full_screen =  (function()
 end)()
 
 local quit = function()
-	os.exit(0)
+	os.exit(true)
 end
 
 local no_stripes = function()
