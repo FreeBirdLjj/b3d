@@ -190,8 +190,9 @@ local candy_striping, doing_transparency, drawing_thumbnails, ctrl_is_pressed, s
 	= false, false, true, false, false
 
 local reverse = function(t)
-	for i = 1, arshift(#t, 1) do
-		t[i], t[#t-(i-1)] = t[#t-(i-1)], t[i]
+	local len_t = #t
+	for i = 1, arshift(len_t, 1) do
+		t[i], t[len_t-(i-1)] = t[len_t-(i-1)], t[i]
 	end
 end
 
@@ -202,7 +203,7 @@ local load_thumbnails = function(orient)
 		= 1, 1, 1
 	local file = open("thumbnails/" .. orient .. "-labelled/names")
 	for filename in file:lines() do
-		bm_names[i] = string.sub(filename, 1, -5)
+		bm_names[i] = filename:sub(1, -5)
 		bm_thumbnails[i] = load("thumbnails/" .. orient .. "-labelled/" .. filename)
 		local width, height = bm_thumbnails[i]:get_size()
 		bm_max_width = max(width, bm_max_width)
@@ -263,13 +264,13 @@ local draw_bitmap_string = function(font, s, x, y, z)
 			glDepthMask(true)
 		end
 	end
-	for i = 1, string.len(s) do
-		glutBitmapCharacter(font, string.byte(s, i))
+	for i = 1, s:len() do
+		glutBitmapCharacter(font, s:byte(i))
 	end
 end
 
 local show_pos = function(x, y, z)
-	draw_bitmap_string("h12", string.format("(%3.1f, %3.1f, %3.1f) [mm]", x, y, z), x, y, z)
+	draw_bitmap_string("h12", ("(%3.1f, %3.1f, %3.1f) [mm]"):format(x, y, z), x, y, z)
 end
 
 local draw_box_list = glGenLists(1)
@@ -389,7 +390,7 @@ on_display = function()
 	-- surface.  This hack on the next line should be replaced with something
 	-- smarter.
 	if(x^2+y^2+z^2<(0.75*zfar)^2) then
-		str = string.format("Mouse location: (%4.3f, %4.3f, %4.3f)", x, y, z)
+		str = ("Mouse location: (%4.3f, %4.3f, %4.3f)"):format(x, y, z)
 		glRasterPos(10, h-20)
 		draw_bitmap_string("h12", str)
 	end
@@ -681,7 +682,7 @@ end
 
 -- Global function add_label() for executing labels.txt
 add_label = function(x, y, z, text)
-	print(string.format("adding label: %3.3f %3.3f %3.3f %s", x, y, z, text))
+	print(("adding label: %3.3f %3.3f %3.3f %s"):format(x, y, z, text))
 	table.insert(labels, {x, y, z, text})
 end
 
@@ -696,7 +697,7 @@ local load_labels = function()
 		print("== Result of wget request ==")
 		os.execute("wget http://brainmaps.org/labels.txt")
 	else
-		io.close(file)
+		file:close()
 	end
 	dofile("labels.txt")
 end
@@ -787,12 +788,12 @@ end
 ---------------
 local key_bindings = {
 	['C'] = function()
-			print(string.format("camera: %.3f %.3f %.3f", calc_camera_coords()))
+			print(("camera: %.3f %.3f %.3f"):format(calc_camera_coords()))
 		end,
 	['L'] = load_labels,
 	['m'] = cycle_through_draw_styles,
 	['P'] =	function()
-			print(string.format("%4.3f %4.3f %4.3f", get_mouse_location()))
+			print(("%4.3f %4.3f %4.3f"):format(get_mouse_location()))
 		end,
 	['p'] = add_mouse_label,
 	['?'] = help,
@@ -839,7 +840,7 @@ on_keyboard = function(key, xi, yi)
 		-- If it's backspace or delete, then try to delete the last
 		-- character in the command.
 		elseif(key==8 or key==127) then
-			command = string.sub(command, 1, -2)
+			command = command:sub(1, -2)
 
 		-- If it's Esc or ctrl-c, then abort the command
 		elseif(key==27 or key==3) then
