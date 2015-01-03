@@ -79,7 +79,7 @@ local pi = math.pi
 local sin = math.sin
 local sqrt = math.sqrt
 
-local unpack = unpack
+local unpack = table.unpack
 
 -- Boolean values
 local GL_FALSE			= 0x0000
