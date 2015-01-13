@@ -1,8 +1,8 @@
 #include "lua_glu.h"
 
-BIND_1_1(string, gluErrorString, int)
+BIND_1_1(string, gluErrorString, integer)
 
-BIND_1_1(string, gluGetString, int)
+BIND_1_1(string, gluGetString, integer)
 
 int l_gluLookAt(lua_State *L){
 	gluLookAt(
@@ -30,7 +30,7 @@ int l_gluPickMatrix(lua_State *L){
 
 	if(lua_gettop(L)==8){
 		for(i = 0; i<4; i++){
-			viewport[i] = luaL_checkint(L, i+5);
+			viewport[i] = luaL_checkinteger(L, i+5);
 		}
 	}
 	else{
@@ -43,7 +43,7 @@ int l_gluPickMatrix(lua_State *L){
 		luaL_checknumber(L, 4),
 		viewport
 	);
-	
+
 	return 0;
 }
 
@@ -81,7 +81,7 @@ int l_gluUnProject(lua_State *L){
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
 	lua_pushnumber(L, z);
-	
+
 	return 3;
 }
 
