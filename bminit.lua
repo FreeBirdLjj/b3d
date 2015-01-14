@@ -7,7 +7,6 @@ local glu = glu
 local glut = glut
 local io = io
 local math = math
-local bit32 = bit32
 local os = os
 local bm = bm
 
