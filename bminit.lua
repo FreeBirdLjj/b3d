@@ -207,8 +207,8 @@ local load_thumbnails = function(orient)
 
 		local width, height = bm_thumbnails[i]:get_size()
 
-		bm_max_width = max(width, bm_max_width)
-		bm_max_height = max(height, bm_max_height)
+		bm_max_width  = max(bm_max_width,  width)
+		bm_max_height = max(bm_max_height, height)
 		i = i + 1
 	end
 
@@ -531,7 +531,7 @@ end
 -- object being viewed.
 
 local zoom_to_fit = function()
-	camera_distance = sqrt(edges[1]^2+edges[2]^2+edges[3]^2)/sin(fovy_deg*pi/360.0)/2.0
+	camera_distance = sqrt(edges[1] ^ 2 + edges[2] ^ 2 + edges[3] ^ 2) / sin(fovy_deg * pi / 360.0) / 2.0
 	camera_pivot = center
 end
 
