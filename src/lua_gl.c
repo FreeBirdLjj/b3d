@@ -420,15 +420,15 @@ int l_glGetClipPlane(lua_State *L){
 BIND_1_1(number, glIsEnabled, integer)
 
 int l_glGetDoublev(lua_State *L){
-	GLdouble params[32];
+	GLdouble params[16];
 	int i;
 
-	for(i = 0; i<32; i++){
+	for(i = 0; i<16; i++){
 		params[i] = DBL_MAX;
 	}
 	glGetDoublev(luaL_checkinteger(L, 1), params);
 
-	for(i = 0; (i<32)&&(params[i]!=DBL_MAX); i++){
+	for(i = 0; (i<16)&&(params[i]!=DBL_MAX); i++){
 		lua_pushnumber(L, params[i]);
 	}
 
@@ -436,15 +436,15 @@ int l_glGetDoublev(lua_State *L){
 }
 
 int l_glGetBooleanv(lua_State *L){
-	GLboolean params[32];
+	GLboolean params[16];
 	int i;
 
-	for(i = 0; i<32; i++){
+	for(i = 0; i<16; i++){
 		params[i] = ~0;
 	}
 	glGetBooleanv(luaL_checkinteger(L, 1), params);
 
-	for(i = 0; (i<32)&&(params[i]!=(~0)); i++){
+	for(i = 0; (i<16)&&(params[i]!=(~0)); i++){
 		lua_pushnumber(L, params[i]);
 	}
 
