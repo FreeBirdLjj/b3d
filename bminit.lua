@@ -23,7 +23,7 @@ local glBegin = gl.glBegin
 local glCallList = gl.glCallList
 local glClear = gl.glClear
 local glClearColor = gl.glClearColor
-local glColor = gl.glColor
+local glColord = gl.glColord
 local glDepthMask = gl.glDepthMask
 local glDisable = gl.glDisable
 local glEnable = gl.glEnable
@@ -42,12 +42,12 @@ local glPixelZoom = gl.glPixelZoom
 local glPointSize = gl.glPointSize
 local glPopMatrix = gl.glPopMatrix
 local glPushMatrix = gl.glPushMatrix
-local glRasterPos = gl.glRasterPos
+local glRasterPosd = gl.glRasterPosd
 local glReadPixels = gl.glReadPixels
 local glRotated = gl.glRotated
 local glScaled = gl.glScaled
 local glTranslated = gl.glTranslated
-local glVertex = gl.glVertex
+local glVertexd = gl.glVertexd
 local glViewport = gl.glViewport
 
 local gluPerspective = glu.gluPerspective
@@ -265,10 +265,10 @@ local draw_bitmap_string = function(font, s, x, y, z)
 
 	if (x) then
 		if (z) then
-			glRasterPos(x, y, z)
+			glRasterPosd(x, y, z)
 		else
 			glDepthMask(false)
-			glRasterPos(x, y)
+			glRasterPosd(x, y)
 			glDepthMask(true)
 		end
 	end
@@ -349,7 +349,7 @@ on_display = function()
 	glPopMatrix()
 	glDisable(GL_LIGHTING)
 
-	glColor(unpack(axes_color))
+	glColord(unpack(axes_color))
 	glCallList(draw_box_list)
 
 	local x, y, z = get_mouse_location()
@@ -361,37 +361,37 @@ on_display = function()
 		glBegin(GL_QUADS)
 
 		-- coronal
-		glColor(unpack(coronal_plane_color))
-		glVertex(scene_box[1], scene_box[2], z)
-		glVertex(scene_box[1], scene_box[5], z)
-		glVertex(scene_box[4], scene_box[5], z)
-		glVertex(scene_box[4], scene_box[2], z)
+		glColord(unpack(coronal_plane_color))
+		glVertexd(scene_box[1], scene_box[2], z)
+		glVertexd(scene_box[1], scene_box[5], z)
+		glVertexd(scene_box[4], scene_box[5], z)
+		glVertexd(scene_box[4], scene_box[2], z)
 
 		-- horizontal
-		glColor(unpack(horizontal_plane_color))
-		glVertex(scene_box[1], y, scene_box[3])
-		glVertex(scene_box[1], y, scene_box[6])
-		glVertex(scene_box[4], y, scene_box[6])
-		glVertex(scene_box[4], y, scene_box[3])
+		glColord(unpack(horizontal_plane_color))
+		glVertexd(scene_box[1], y, scene_box[3])
+		glVertexd(scene_box[1], y, scene_box[6])
+		glVertexd(scene_box[4], y, scene_box[6])
+		glVertexd(scene_box[4], y, scene_box[3])
 
 		-- sagittal
-		glColor(unpack(sagittal_plane_color))
-		glVertex(x, scene_box[2], scene_box[3])
-		glVertex(x, scene_box[2], scene_box[6])
-		glVertex(x, scene_box[5], scene_box[6])
-		glVertex(x, scene_box[5], scene_box[3])
+		glColord(unpack(sagittal_plane_color))
+		glVertexd(x, scene_box[2], scene_box[3])
+		glVertexd(x, scene_box[2], scene_box[6])
+		glVertexd(x, scene_box[5], scene_box[6])
+		glVertexd(x, scene_box[5], scene_box[3])
 
 		glEnd()
 
 		-- Draw lines where the planes of section intersect
 		glBegin(GL_LINES)
-		glColor(0.0, 0.0, 0.0, 1.0)	-- back to black
-		glVertex(x, y, scene_box[3])
-		glVertex(x, y, scene_box[6])
-		glVertex(scene_box[1], y, z)
-		glVertex(scene_box[4], y, z)
-		glVertex(x, scene_box[2], z)
-		glVertex(x, scene_box[5], z)
+		glColord(0.0, 0.0, 0.0, 1.0)	-- back to black
+		glVertexd(x, y, scene_box[3])
+		glVertexd(x, y, scene_box[6])
+		glVertexd(scene_box[1], y, z)
+		glVertexd(scene_box[4], y, z)
+		glVertexd(x, scene_box[2], z)
+		glVertexd(x, scene_box[5], z)
 		glEnd()
 
 		glDepthMask(true)
@@ -416,13 +416,13 @@ on_display = function()
 	-- smarter.
 	if (x ^ 2 + y ^ 2 + z ^ 2 < (0.75 * zfar) ^ 2) then
 		str = ("Mouse location: (%4.3f, %4.3f, %4.3f)"):format(x, y, z)
-		glRasterPos(10, h - 20)
+		glRasterPosd(10, h - 20)
 		draw_bitmap_string("h12", str)
 	end
 
 	-- More here: print out other info of interest: frame rate, etc.
 	if (kb_cmd_mode) then
-		glRasterPos(10, 10)
+		glRasterPosd(10, 10)
 		draw_bitmap_string("h12", "lua> " .. command .. "|")
 	end
 
@@ -435,7 +435,7 @@ on_display = function()
 	end
 
 	if (#labels > 0) then
-		glColor(unpack(label_color))
+		glColord(unpack(label_color))
 
 		for _, L in pairs(labels) do
 			x, y, z, s = unpack(L)
@@ -448,13 +448,13 @@ on_display = function()
 
 		for _, L in pairs(labels) do
 			x, y, z, s = unpack(L)
-			glVertex(x, y, z)
+			glVertexd(x, y, z)
 		end
 
 		glEnd()
 
 		glPointSize(1)
-		glColor(0.0, 0.0, 0.0, 1.0)
+		glColord(0.0, 0.0, 0.0, 1.0)
 	end
 
 	if (drawing_thumbnails) then
@@ -479,26 +479,26 @@ on_display = function()
 		glPixelZoom(1.0, -1.0)	-- GL draws images upside down by default.
 
 		-- Draw a white square behind all the images
-		glColor(1, 1, 1)
+		glColord(1, 1, 1)
 
 		local x0, y0, x1, y1
 			= 1, 1, bm.coronal_max_width, h
 
 		glBegin(GL_QUADS)
-		glVertex(x0, y0)
-		glVertex(x1, y0)
-		glVertex(x1, y1)
-		glVertex(x0, y1)
+		glVertexd(x0, y0)
+		glVertexd(x1, y0)
+		glVertexd(x1, y1)
+		glVertexd(x0, y1)
 		glEnd()
 
-		glColor(0, 0, 0)
+		glColord(0, 0, 0)
 
 		local cor_img = bm.coronal_thumbnails[icor]
 
 		h = h - 1
 
 		if (cor_img) then
-			glRasterPos(1, h)
+			glRasterPosd(1, h)
 			cor_img:draw_pixels()
 		end
 
@@ -507,7 +507,7 @@ on_display = function()
 		local sag_img = bm.sagittal_thumbnails[isag]
 
 		if (sag_img) then
-			glRasterPos(1, h)
+			glRasterPosd(1, h)
 			sag_img:draw_pixels()
 		end
 
@@ -516,7 +516,7 @@ on_display = function()
 		local hor_img = bm.horizontal_thumbnails[ihor]
 
 		if (hor_img) then
-			glRasterPos(1, h)
+			glRasterPosd(1, h)
 			hor_img:draw_pixels()
 		end
 

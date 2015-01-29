@@ -52,7 +52,7 @@
 BIND_0_1(glBegin, integer);
 BIND_0_0(glEnd)
 
-int l_glVertex(lua_State *L){
+int l_glVertexd(lua_State *L){
 	switch(lua_gettop(L)){
 	case 2:
 		glVertex2d(luaL_checknumber(L, 1), luaL_checknumber(L, 2));
@@ -73,7 +73,7 @@ int l_glVertex(lua_State *L){
 		);
 		break;
 	default:
-		luaL_error(L, "Wrong number of arguments to glVertex().  Need 2,3, or 4.");
+		luaL_error(L, "Wrong number of arguments to glVertexf().  Need 2,3, or 4.");
 		break;
 	}
 
@@ -82,7 +82,7 @@ int l_glVertex(lua_State *L){
 
 BIND_0_3(glNormal3d, number, number, number)
 
-int l_glColor(lua_State *L){
+int l_glColord(lua_State *L){
 	switch(lua_gettop(L)){
 	case 3:
 		glColor3d(
@@ -107,7 +107,7 @@ int l_glColor(lua_State *L){
 	return 0;
 }
 
-int l_glRasterPos(lua_State *L){
+int l_glRasterPosd(lua_State *L){
 	switch(lua_gettop(L)){
 	case 2:
 		glRasterPos2d(luaL_checknumber(L, 1), luaL_checknumber(L, 2));
@@ -135,7 +135,7 @@ int l_glRasterPos(lua_State *L){
 	return 0;
 }
 
-int l_glTexCoord(lua_State *L){
+int l_glTexCoordd(lua_State *L){
 	switch(lua_gettop(L)){
 	case 1:
 		glTexCoord1d(luaL_checknumber(L, 1));
@@ -166,16 +166,7 @@ int l_glTexCoord(lua_State *L){
 	return 0;
 }
 
-int l_glRect(lua_State *L){
-	glRectd(
-		luaL_checknumber(L, 1),
-		luaL_checknumber(L, 2),
-		luaL_checknumber(L, 3),
-		luaL_checknumber(L, 4)
-	);
-
-	return 0;
-}
+BIND_0_4(glRectd, number, number, number, number);
 
 int l_glMaterial(lua_State *L){
 	GLenum pname = luaL_checkinteger(L, 2);
@@ -243,7 +234,7 @@ static void make_gl_matrix_from_lua_stack(lua_State *L, GLdouble m[16]){
 	}
 }
 
-int l_glLoadMatrix(lua_State *L){
+int l_glLoadMatrixd(lua_State *L){
 	GLdouble m[16];
 
 	make_gl_matrix_from_lua_stack(L, m);
@@ -252,7 +243,7 @@ int l_glLoadMatrix(lua_State *L){
 	return 0;
 }
 
-int l_glMultMatrix(lua_State *L){
+int l_glMultMatrixd(lua_State *L){
 	GLdouble m[16];
 
 	make_gl_matrix_from_lua_stack(L, m);
@@ -417,7 +408,7 @@ int l_glGetClipPlane(lua_State *L){
 	return 4;
 }
 
-BIND_1_1(number, glIsEnabled, integer)
+BIND_1_1(integer, glIsEnabled, integer)
 
 int l_glGetDoublev(lua_State *L){
 	GLdouble params[16];
@@ -457,7 +448,7 @@ BIND_0_0(glPopAttrib)
 BIND_0_1(glPushClientAttrib, integer)
 BIND_0_0(glPopClientAttrib)
 
-BIND_1_1(number, glRenderMode, integer)
+BIND_1_1(integer, glRenderMode, integer)
 
 int l_glGetError(lua_State *L){
 	lua_pushnumber(L, glGetError());
@@ -489,7 +480,7 @@ int l_glDepthMask(lua_State *L){
 	return 0;
 }
 
-BIND_0_2(glDepthRange, integer, integer);
+BIND_0_2(glDepthRange, number, number);
 
 /*
  * Accumulation Buffer
@@ -708,7 +699,7 @@ int l_glDeleteTextures(lua_State *L){
 
 BIND_0_2(glBindTexture, integer, integer)
 
-BIND_1_1(number, glIsTexture, integer)
+BIND_1_1(integer, glIsTexture, integer)
 
 BIND_0_7(glCopyTexImage1D, integer, integer, integer, integer, integer, integer, integer)
 BIND_0_8(glCopyTexImage2D, integer, integer, integer, integer, integer, integer, integer, integer)
@@ -842,14 +833,14 @@ static const struct luaL_Reg gl_lib[] = {
 	ENTRY(glCopyTexSubImage2D),
 	ENTRY(glFogf),
 	ENTRY(glFogi),
-	ENTRY(glVertex),
-	ENTRY(glColor),
-	ENTRY(glRasterPos),
-	ENTRY(glTexCoord),
-	ENTRY(glRect),
+	ENTRY(glVertexd),
+	ENTRY(glColord),
+	ENTRY(glRasterPosd),
+	ENTRY(glTexCoordd),
+	ENTRY(glRectd),
 	ENTRY(glMaterial),
-	ENTRY(glLoadMatrix),
-	ENTRY(glMultMatrix),
+	ENTRY(glLoadMatrixd),
+	ENTRY(glMultMatrixd),
 	ENTRY(glInterleavedArrays_n3f_v3f),
 	ENTRY(glEdgeFlag),
 	ENTRY(glClipPlane),
