@@ -35,17 +35,10 @@ int l_add_menu_item(lua_State *L){
 	lua_settable(L, -3);
 
 	glutAddMenuEntry(luaL_checkstring(L, 1), index);
-	
-	lua_pushnumber(L, index++);
-	
-	return 1;
-}
 
-int l_get_gl_area_size(lua_State *L){
-	lua_pushnumber(L, glutGet(GLUT_WINDOW_WIDTH));
-	lua_pushnumber(L, glutGet(GLUT_WINDOW_HEIGHT));
-	
-	return 2;
+	lua_pushnumber(L, index++);
+
+	return 1;
 }
 
 int l_os(lua_State *L){
@@ -95,7 +88,6 @@ static const struct luaL_Reg bmlib[] = {
 	ENTRY(warn),
 	ENTRY(get_filename),
 	ENTRY(run_process_in_background),
-	ENTRY(get_gl_area_size),
 	ENTRY(set_idle_callback),
 	ENTRY(os),
 	{NULL, NULL},
