@@ -8,7 +8,7 @@
  * -ijt */
 #define BIND_0_1(f, type)	\
 	int l_ ## f(lua_State *L){	\
-		f(luaL_check ## type(L,1));	\
+		f(luaL_check ## type(L, 1));	\
 		return 0;	\
 	}
 

@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-int is_blank_line(char *s){
+static int is_blank_line(char *s){
 	while(*s){
 		if(!isspace(*s++)){
 			return 0;
@@ -11,23 +11,23 @@ int is_blank_line(char *s){
 
 static int line_num = 0;
 
-int get_line(char buf[], int bufsize, FILE *file){
+static int get_line(char buf[], int bufsize, FILE *file){
 	line_num++;
 	return fgets(buf, bufsize, file)? ((buf[0]=='#')||is_blank_line(buf)? get_line(buf, bufsize, file) : 1) : 0;
 }
 
-float dot3(const GLfloat a[3], const GLfloat b[3]){
+static float dot3(const GLfloat a[3], const GLfloat b[3]){
 	int i;
 	float s = 0.0f;
-	
+
 	for(i = 0; i<3; i++){
 		s += a[i]*b[i];
 	}
-	
+
 	return s;
 }
 
-void calc_face_normal(mesh_t *mesh, GLfloat n[3], int fi){
+static void calc_face_normal(mesh_t *mesh, GLfloat n[3], int fi){
 	int *t = mesh->tris[fi].iv;
 	int i;
 	GLfloat a[3], b[3];					/* first and second edge vectors */
@@ -45,7 +45,7 @@ void calc_face_normal(mesh_t *mesh, GLfloat n[3], int fi){
 
 /* This function is intended to only be called once, to construct the display
  * list.  Thereafter the display list should be used. */
-void mesh_draw(mesh_t *mesh){
+static void mesh_drawlist(mesh_t *mesh){
 	fprintf(stderr, "Regenerating mesh for OpenGL...\n"
 			"Normal style: ");
 	switch(normal_style){
@@ -180,7 +180,7 @@ void mesh_draw(mesh_t *mesh){
 			}
 		}
 	}
-	
+
 	if(verbosity){
 		fprintf(stderr, "Done.\n");
 	}
@@ -193,15 +193,15 @@ void mesh_draw(mesh_t *mesh){
 	free(norms);
 }
 
-static mesh_t *checkmesh(lua_State *L){
-	mesh_t *m = (mesh_t *)luaL_checkudata(L, 1, "brainmaps_mesh");
-	luaL_argcheck(L, m!=NULL, 1, "`mesh' expected");
+static mesh_t *luaL_checkmesh(lua_State *L, const int arg){
+	mesh_t *m = (mesh_t *)luaL_checkudata(L, arg, "brainmaps_mesh");
+	luaL_argcheck(L, m!=NULL, arg, "`mesh' expected");
 
 	return m;
 }
 
 static int l_mesh_get_bounds(lua_State *L){
-	mesh_t *m = checkmesh(L);
+	mesh_t *m = luaL_checkmesh(L, 1);
 	int i;
 
 	for(i = 0; i<3; i++){
@@ -210,12 +210,12 @@ static int l_mesh_get_bounds(lua_State *L){
 	for(i = 0; i<3; i++){
 		lua_pushnumber(L, m->pmax[i]);
 	}
-	
+
 	return 6;
 }
 
 /* The passed in mesh is expected to have just its own memory allocated. */
-int mesh_load(mesh_t *mesh, FILE *file){
+static int mesh_load(mesh_t *mesh, FILE *file){
 	int i, j;
 	/* Load the mesh */
 	char buf[80];
@@ -288,7 +288,7 @@ int mesh_load(mesh_t *mesh, FILE *file){
 	/* Set up the display list */
 	mesh->gl_display_list = glGenLists(1);
 	glNewList(mesh->gl_display_list, GL_COMPILE);
-	mesh_draw(mesh);
+	mesh_drawlist(mesh);
 	glEndList();
 
 	return 0;						/* ok */
@@ -316,13 +316,11 @@ static int l_mesh_load(lua_State *L){
 	return 1;	/* The mesh pointer is on top of the stack. */
 }
 
-static int l_mesh_draw(lua_State *L){
-	mesh_t *m = checkmesh(L);
-	
+static void mesh_draw(mesh_t *m){
 	glCallList(m->gl_display_list);
-
-	return 0;
 }
+
+BIND_0_1(mesh_draw, mesh);
 
 #define mesh_ENTRY(f)	{# f, l_mesh_ ## f}
 
@@ -339,21 +337,19 @@ static const struct luaL_Reg meshlib_m[] = {
 	{NULL, NULL}
 };
 
-static int mesh_gc(lua_State *L){
-	mesh_t *m = checkmesh(L);
-
+static void mesh_gc(mesh_t *m){
 	if(verbosity){
 		fprintf(stderr, "Freeing mesh %p\n", m);
 	}
-	
+
 	if(m){
 		glDeleteLists(m->gl_display_list, 1);
 		free(m->verts);
 		free(m->tris);
 	}
-	
-	return 0;
 }
+
+BIND_0_1(mesh_gc, mesh)
 
 int luaopen_mesh(lua_State *L){
 	luaL_newmetatable(L, "brainmaps_mesh");
@@ -361,7 +357,7 @@ int luaopen_mesh(lua_State *L){
 	/* Set the __gc field of the metatable so that meshes will be garbage
 	 * collected. */
 	lua_pushstring(L, "__gc");
-	lua_pushcfunction(L, mesh_gc);
+	lua_pushcfunction(L, l_mesh_gc);
 	lua_settable(L, -3);
 
 	/* p. 245 */
