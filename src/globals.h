@@ -16,11 +16,11 @@
 #define NS_FLAT		3
 
 /* These are defined in main.c */
-extern int normal_style, verbosity;
+extern const int normal_style, verbosity;
 extern lua_State *lua_state;
-extern char *progname, *init_filename;
+extern const char *init_filename;
 
-extern GLdouble alpha;
-extern GLenum polygon_mode;
+extern const GLdouble alpha;
+extern const GLenum polygon_mode;
 
 #endif
