@@ -30,21 +30,9 @@ BIND_0_2(glutInitWindowSize, integer, integer)
 BIND_0_0(glutMainLoop)
 
 /* GLUT window sub-API. */
-BIND_1_1(number, glutCreateWindow, string)
+BIND_1_1(integer, glutCreateWindow, string)
 
-int l_glutCreateSubWindow(lua_State *L){
-	lua_pushnumber(L,
-		glutCreateSubWindow(
-			luaL_checkinteger(L, 1),
-			luaL_checkinteger(L, 2),
-			luaL_checkinteger(L, 3),
-			luaL_checkinteger(L, 4),
-			luaL_checkinteger(L, 5)
-		)
-	);
-
-	return 1;
-}
+BIND_1_5(integer, glutCreateSubWindow, integer, integer, integer, integer, integer)
 
 BIND_0_1(glutDestroyWindow, integer)
 BIND_0_0(glutPostRedisplay)
@@ -52,7 +40,7 @@ BIND_0_0(glutPostRedisplay)
 BIND_0_1(glutPostWindowRedisplay, integer)
 #endif
 BIND_0_0(glutSwapBuffers)
-BIND_1_0(number, glutGetWindow)
+BIND_1_0(integer, glutGetWindow)
 BIND_0_1(glutSetWindow, integer)
 BIND_0_1(glutSetWindowTitle, string)
 BIND_0_1(glutSetIconTitle, string)
@@ -84,7 +72,7 @@ BIND_0_0(glutHideOverlay)
 
 /* GLUT menu sub-API. */
 BIND_0_1(glutDestroyMenu, integer)
-BIND_1_0(number, glutGetMenu)
+BIND_1_0(integer, glutGetMenu)
 BIND_0_1(glutSetMenu, integer)
 BIND_0_2(glutAddMenuEntry, string, integer)
 BIND_0_2(glutAddSubMenu, string, integer)
@@ -100,8 +88,8 @@ BIND_1_2(number, glutGetColor, integer, integer)
 BIND_0_1(glutCopyColormap, integer)
 
 /* GLUT state retrieval sub-API. */
-BIND_1_1(number, glutGet, integer)
-BIND_1_1(number, glutDeviceGet, integer)
+BIND_1_1(integer, glutGet, integer)
+BIND_1_1(integer, glutDeviceGet, integer)
 #if (GLUT_API_VERSION>=2)
 /* GLUT extension support sub-API */
 BIND_1_1(number, glutExtensionSupported, string)
@@ -193,7 +181,7 @@ BIND_0_0(glutSolidIcosahedron)
 
 #if ((GLUT_API_VERSION>=4)||(GLUT_XLIB_IMPLEMENTATION>=9))
 /* GLUT video resize sub-API. */
-BIND_1_1(number, glutVideoResizeGet, integer)
+BIND_1_1(integer, glutVideoResizeGet, integer)
 BIND_0_0(glutSetupVideoResizing)
 BIND_0_0(glutStopVideoResizing)
 BIND_0_4(glutVideoResize, integer, integer, integer, integer)
@@ -214,9 +202,9 @@ BIND_0_0(glutForceJoystickFunc)
 
 /* GLUT game mode sub-API. */
 /* glutGameModeGet. */
-BIND_1_0(number, glutEnterGameMode)
+BIND_0_0(glutEnterGameMode)
 BIND_0_0(glutLeaveGameMode)
-BIND_1_1(number, glutGameModeGet, integer)
+BIND_1_1(integer, glutGameModeGet, integer)
 #endif
 
 #define ENTRY(f)	{ # f, l_ ## f }

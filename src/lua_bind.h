@@ -95,6 +95,31 @@
 		return 1;	\
 	}
 
+#define BIND_1_3(t_out, f, t1, t2, t3)	\
+	int l_ ## f(lua_State *L){	\
+		lua_push ## t_out(L,	\
+		                  f(luaL_check ## t1(L, 1), luaL_check ## t2(L, 2),	\
+		                    luaL_check ## t3(L, 3)));	\
+		return 1;	\
+	}
+
+#define BIND_1_4(t_out, f, t1, t2, t3, t4)	\
+	int l_ ## f(lua_State *L){	\
+		lua_push ## t_out(L,	\
+		                  f(luaL_check ## t1(L, 1), luaL_check ## t2(L, 2),	\
+		                    luaL_check ## t3(L, 3), luaL_check ## t4(L, 4)));	\
+		return 1;	\
+	}
+
+#define BIND_1_5(t_out, f, t1, t2, t3, t4, t5)	\
+	int l_ ## f(lua_State *L){	\
+		lua_push ## t_out(L,	\
+		                  f(luaL_check ## t1(L, 1), luaL_check ## t2(L, 2),	\
+		                    luaL_check ## t3(L, 3), luaL_check ## t4(L, 4),	\
+		                    luaL_check ## t5(L, 5)));	\
+		return 1;	\
+	}
+
 #define BIND_1_0(t_out, f)	\
 	int l_ ## f(lua_State *L){	\
 		lua_push ## t_out(L, f());	\
