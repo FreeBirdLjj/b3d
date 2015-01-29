@@ -10,10 +10,12 @@
 
 #define MAX_LABEL_LEN	10*80
 
-#define NS_DIV_BY_AREA	0
-#define NS_NORMALIZE	1
-#define NS_MUL_BY_AREA	2
-#define NS_FLAT		3
+const enum {
+	NS_DIV_BY_AREA,
+	NS_NORMALIZE,
+	NS_MUL_BY_AREA,
+	NS_FLAT
+};
 
 /* These are defined in main.c */
 extern const int normal_style, verbosity;
