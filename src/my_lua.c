@@ -63,7 +63,7 @@ int l_run_process_in_background(lua_State *L){
 	system(command_line);
 
 	free(command_line);
-	
+
 	return 0;
 }
 
@@ -72,9 +72,9 @@ int l_get_filename(lua_State *L){
 
 	printf("Please enter a filename: ");
 	fgets(buf, sizeof(buf), stdin);
-	
+
 	lua_pushstring(L, buf);
-	
+
 	return 1;
 }
 
@@ -116,15 +116,15 @@ int file_exists(char filename[]){
 		return 0;
 	}
 	fclose(file);
-	
+
 	return 1;
 }
 
 char *get_current_dir(void){
 	char *buf = (char *)malloc(80);
-	
+
 	getcwd(buf, 80);
-	
+
 	return buf;
 }
 
