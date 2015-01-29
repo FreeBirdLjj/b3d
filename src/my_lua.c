@@ -2,11 +2,11 @@
 
 #include "my_lua.h"
 
-int l_warn(lua_State *L){
-	fprintf(stderr, "Warning: %s\n", luaL_checkstring(L, 1));
-
-	return 0;
+void warn(const char *s){
+	fprintf(stderr, "%s\n", s);
 }
+
+BIND_0_1(warn, string);
 
 int l_reset_menu(lua_State *L){
 	if((luaL_loadbuffer(L, "menu_callbacks={}", /* strlen */ 17 , "cmd"))||lua_pcall(L, 0, 0, 0)){
@@ -41,31 +41,26 @@ int l_add_menu_item(lua_State *L){
 	return 1;
 }
 
-int l_os(lua_State *L){
-	lua_pushstring(L, "gnu");
-
-	return 1;
-}
-
 /* Some of the code in this function was taken from Microsoft's
    documentation on their website. */
-int l_run_process_in_background(lua_State *L){
-	char *command_line = strdup(luaL_checkstring(L, 1));
+void run_process_in_background(const char *command_line){
+
+	char *command_line_copy = strdup(command_line);
 	int len = strlen(command_line);
 
 	/* Append the background symbol '&' if it is not already at the end of the
 	 * string. */
-	if(command_line[len-1]!='&'){
-		command_line = realloc(command_line, len+2);
-		command_line[len] = '&';
-		command_line[len+1] = '\0';
+	if(command_line_copy[len-1]!='&'){
+		command_line_copy = realloc(command_line_copy, len+2);
+		command_line_copy[len] = '&';
+		command_line_copy[len+1] = '\0';
 	}
-	system(command_line);
+	system(command_line_copy);
 
-	free(command_line);
-
-	return 0;
+	free(command_line_copy);
 }
+
+BIND_0_1(run_process_in_background, string);
 
 int l_get_filename(lua_State *L){
 	char buf[4*80];
@@ -89,7 +84,6 @@ static const struct luaL_Reg bmlib[] = {
 	ENTRY(get_filename),
 	ENTRY(run_process_in_background),
 	ENTRY(set_idle_callback),
-	ENTRY(os),
 	{NULL, NULL},
 };
 
@@ -153,7 +147,7 @@ void brainmaps_start_lua(void){
 	l_reset_menu(lua_state);
 
 	/* Search up the directory tree for a while to find the init script. */
-	while(strcmp(get_current_dir(), "/"))
+	while(strcmp(get_current_dir(), "/")){
 		if(file_exists(init_filename)){
 			if((luaL_loadfile(lua_state, init_filename))||lua_pcall(lua_state, 0, 0, 0)){
 				fprintf(stderr, "Fatal error: The init file did not run: %s\n", lua_tostring(lua_state, -1));
@@ -169,5 +163,5 @@ void brainmaps_start_lua(void){
 			}
 			chdir("..");
 		}
+	}
 }
-
