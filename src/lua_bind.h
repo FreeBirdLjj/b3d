@@ -71,7 +71,7 @@
 		  luaL_check ## t3(L, 3), luaL_check ## t4(L, 4),	\
 		  luaL_check ## t5(L, 5), luaL_check ## t6(L, 6),	\
 		  luaL_check ## t7(L, 7), luaL_check ## t8(L, 8),	\
-		  luaL_check ## t9(L, 9));
+		  luaL_check ## t9(L, 9));				\
 		return 0;	\
 	}
 
