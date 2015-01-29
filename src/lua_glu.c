@@ -4,20 +4,7 @@ BIND_1_1(string, gluErrorString, integer)
 
 BIND_1_1(string, gluGetString, integer)
 
-int l_gluLookAt(lua_State *L){
-	gluLookAt(
-		luaL_checknumber(L, 1),
-		luaL_checknumber(L, 2),
-		luaL_checknumber(L, 3),
-		luaL_checknumber(L, 4),
-		luaL_checknumber(L, 5),
-		luaL_checknumber(L, 6),
-		luaL_checknumber(L, 7),
-		luaL_checknumber(L, 8),
-		luaL_checknumber(L, 9)
-	);
-	return 0;
-}
+BIND_0_9(gluLookAt, number, number, number, number, number, number, number, number, number)
 
 BIND_0_4(gluOrtho2D, number, number, number, number)
 
