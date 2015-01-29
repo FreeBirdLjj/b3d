@@ -65,6 +65,16 @@
 		return 0;	\
 	}
 
+#define BIND_0_9(f, t1, t2, t3, t4, t5, t6, t7, t8, t9)	\
+	int l_ ## f(lua_State *L){	\
+		f(luaL_check ## t1(L, 1), luaL_check ## t2(L, 2),	\
+		  luaL_check ## t3(L, 3), luaL_check ## t4(L, 4),	\
+		  luaL_check ## t5(L, 5), luaL_check ## t6(L, 6),	\
+		  luaL_check ## t7(L, 7), luaL_check ## t8(L, 8),	\
+		  luaL_check ## t9(L, 9));
+		return 0;	\
+	}
+
 /* Bind a `function' taking no inputs and returning void. */
 #define BIND_0_0(f)	\
 	int l_ ## f(lua_State *L){	\
@@ -85,7 +95,7 @@
 		return 1;	\
 	}
 
-#define BIND_1_0(t_out,f)	\
+#define BIND_1_0(t_out, f)	\
 	int l_ ## f(lua_State *L){	\
 		lua_push ## t_out(L, f());	\
 		return 1;	\
