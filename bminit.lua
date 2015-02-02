@@ -65,8 +65,6 @@ local glutWireCube = glut.glutWireCube
 local max = math.max
 local min = math.min
 
-local open = io.open
-
 local pi = math.pi
 
 local sin = math.sin
@@ -197,7 +195,7 @@ local load_thumbnails = function(orient)
 		= {}, {}
 	local bm_max_width, bm_max_height, i
 		= 1, 1, 1
-	local file = open("thumbnails/" .. orient .. "-labelled/names")
+	local file = io.open("thumbnails/" .. orient .. "-labelled/names")
 
 	for filename in file:lines() do
 		bm_names[i] = filename:sub(1, -5)
@@ -753,7 +751,7 @@ end
 local load_labels = function()
 	print("load_labels")
 
-	local file, err = open("labels.txt")
+	local file, err = io.open("labels.txt")
 
 	if(err) then
 		print("== Result of wget request ==")
