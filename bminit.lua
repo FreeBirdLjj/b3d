@@ -633,7 +633,7 @@ local zoom_in = function()
 			local u = (3.0 - 2.0 * t) * (t ^ 2)
 			local v = 1.0 - u
 
-			for i = 1, 3 do
+			for i = 1, #camera_offset do
 				camera_offset[i] = v * cam_off0[i]
 			end
 
@@ -846,7 +846,7 @@ on_motion = function(xi, yi)
 
 		glPopMatrix()
 
-		for i = 1, 3 do
+		for i = 1, #camera_offset do
 			camera_offset[i] = camera_offset[i] + edges[i] * (p[i] - pprev[i])
 		end
 	else
