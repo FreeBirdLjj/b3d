@@ -2,14 +2,14 @@
 
 #include "my_lua.h"
 
-void warn(const char *s)
+static void warn(const char *s)
 {
 	fprintf(stderr, "%s\n", s);
 }
 
 BIND_0_1(warn, string);
 
-int l_reset_menu(lua_State *L)
+static int l_reset_menu(lua_State *L)
 {
 	if (luaL_loadbuffer(L, "menu_callbacks={}", /* strlen */ 17 , "cmd") || lua_pcall(L, 0, 0, 0)) {
 		fprintf(stderr, "%s", lua_tostring(L, -1));
@@ -22,7 +22,7 @@ int l_reset_menu(lua_State *L)
 	return 0;
 }
 
-int l_add_menu_item(lua_State *L)
+static int l_add_menu_item(lua_State *L)
 {
 	static int index = 0;
 
@@ -47,7 +47,7 @@ int l_add_menu_item(lua_State *L)
 
 /* Some of the code in this function was taken from Microsoft's
    documentation on their website. */
-void run_process_in_background(const char *command_line)
+static void run_process_in_background(const char *command_line)
 {
 	char *command_line_copy = strdup(command_line);
 	const int len = strlen(command_line);
@@ -67,7 +67,7 @@ void run_process_in_background(const char *command_line)
 
 BIND_0_1(run_process_in_background, string);
 
-int l_get_filename(lua_State *L)
+static int l_get_filename(lua_State *L)
 {
 	char buf[4 * 80];
 
@@ -93,7 +93,7 @@ static const struct luaL_Reg bmlib[] = {
 	{NULL, NULL},
 };
 
-int l_open_bmlib(lua_State *L)
+static int l_open_bmlib(lua_State *L)
 {
 	luaL_newlib(L, bmlib);
 	return 1;
@@ -110,7 +110,7 @@ static const luaL_Reg lualibs[] = {
 	{NULL, NULL},
 };
 
-int file_exists(const char filename[])
+static int file_exists(const char filename[])
 {
 	FILE *file = fopen(filename, "r");
 
@@ -123,7 +123,7 @@ int file_exists(const char filename[])
 	return 1;
 }
 
-char *get_current_dir(void)
+static char *get_current_dir(void)
 {
 	char *buf = (char *)malloc(80);
 
