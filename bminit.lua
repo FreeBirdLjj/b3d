@@ -771,7 +771,7 @@ local calc_camera_coords = function()
 		= -y_angle_deg / 180.0 * pi, -x_angle_deg / 180.0 * pi
 	local cx, cy, cz = unpack(camera_pivot)
 
-	return cx+camera_distance * cos(phi) * sin(theta), cy + camera_distance * sin(phi), cz + camera_distance * cos(phi) * cos(theta)
+	return cx + camera_distance * cos(phi) * sin(theta), cy + camera_distance * sin(phi), cz + camera_distance * cos(phi) * cos(theta)
 end
 
 local add_mouse_label = function()
