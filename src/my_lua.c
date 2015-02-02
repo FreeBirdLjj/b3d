@@ -147,7 +147,7 @@ void brainmaps_start_lua(void)
 	/* Load libraries */
 	luaL_openlibs(lua_state);
 
-	const luaL_Reg *lib;
+	luaL_Reg *lib;
 
 	for (lib = lualibs; lib->func; lib++){
 
