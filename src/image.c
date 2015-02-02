@@ -19,12 +19,11 @@ int l_image_load(lua_State *L){
 	return 1;	/* Tell Lua about the image we're returning on its stack. */
 }
 
-
 static image_t *checkimage(lua_State *L){
 	image_t *img = (image_t *)luaL_checkudata(L, 1, "brainmaps_image");
 
 	luaL_argcheck(L, img!=NULL, 1, "`image' expected");
-	
+
 	return img;
 }
 
@@ -42,7 +41,7 @@ static int l_image_get_size(lua_State *L){
 
 	lua_pushnumber(L, im->nx);
 	lua_pushnumber(L, im->ny);
-	
+
 	return 2;
 }
 
@@ -69,7 +68,7 @@ static int image_gc(lua_State *L){
 		}
 		free(im->pixels);
 	}
-	
+
 	return 0;
 }
 
