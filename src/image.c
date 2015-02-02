@@ -3,9 +3,18 @@
 #include "image.h"
 
 unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, int *height);
-static image_t *checkimage(lua_State *L);
 
-int l_image_load(lua_State *L){
+static image_t *luaL_checkimage(lua_State *L, int arg)
+{
+	image_t *img = (image_t *)luaL_checkudata(L, arg, "brainmaps_image");
+
+	luaL_argcheck(L, img != NULL, 1, "`image' expected");
+
+	return img;
+}
+
+static int l_image_load(lua_State *L)
+{
 	const char *filename = luaL_checkstring(L, 1);
 	image_t *img = (image_t *)lua_newuserdata(L, sizeof(image_t));
 
@@ -19,25 +28,17 @@ int l_image_load(lua_State *L){
 	return 1;	/* Tell Lua about the image we're returning on its stack. */
 }
 
-static image_t *checkimage(lua_State *L){
-	image_t *img = (image_t *)luaL_checkudata(L, 1, "brainmaps_image");
-
-	luaL_argcheck(L, img!=NULL, 1, "`image' expected");
-
-	return img;
-}
-
-static int l_image_draw_pixels(lua_State *L){
-	image_t *im = checkimage(L);
-
+static void image_draw_pixels(image_t *im)
+{
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glDrawPixels(im->nx, im->ny, GL_RGBA, GL_UNSIGNED_BYTE, im->pixels);
-
-	return 0;
 }
 
-static int l_image_get_size(lua_State *L){
-	image_t *im = checkimage(L);
+BIND_0_1(image_draw_pixels, image)
+
+static int l_image_get_size(lua_State *L)
+{
+	image_t *im = luaL_checkimage(L, 1);
 
 	lua_pushnumber(L, im->nx);
 	lua_pushnumber(L, im->ny);
@@ -58,28 +59,32 @@ static const struct luaL_Reg imagelib_m[] = {
 	{NULL, NULL}
 };
 
-static int image_gc(lua_State *L){
-	image_t *im = checkimage(L);
-
+static void image_gc(image_t *im)
+{
 	fprintf(stderr, "Freeing image %p\n", im);
-	if(im){
-		if(im->texture_is_valid){
-			glDeleteTextures(1, &im->gl_texture_name);
-		}
-		free(im->pixels);
+
+	if (im == NULL) {
+		return;
 	}
 
-	return 0;
+	if (im->texture_is_valid) {
+		glDeleteTextures(1, &im->gl_texture_name);
+	}
+
+	free(im->pixels);
 }
 
-int lua_openimage(lua_State *L){
+BIND_0_1(image_gc, image)
+
+int lua_openimage(lua_State *L)
+{
 	luaL_newmetatable(L, "brainmaps_image");
 
 	/* Set the __gc field of the metatable so the images will be garbage
 	 * collected.
 	 */
 	lua_pushstring(L, "__gc");
-	lua_pushcfunction(L, image_gc);
+	lua_pushcfunction(L, l_image_gc);
 	lua_settable(L, -3);
 
 	/* p. 245 */
@@ -154,7 +159,7 @@ int lua_openimage(lua_State *L){
  * Here's the extended error handler struct:
  */
 
-struct my_error_mgr{
+struct my_error_mgr {
 	struct jpeg_error_mgr pub;				/* "public" fields */
 	jmp_buf setjmp_buffer;					/* for return to caller */
 };
@@ -165,7 +170,8 @@ typedef struct my_error_mgr *my_error_ptr;
  * Here's the routine that will replace the standard error_exit method:
  */
 
-METHODDEF(void) my_error_exit(j_common_ptr cinfo){
+METHODDEF(void) my_error_exit(j_common_ptr cinfo)
+{
 	/* cinfo->err really points to a my_error_mgr struct, so coerce pointer */
 	my_error_ptr myerr = (my_error_ptr)cinfo->err;
 
@@ -183,8 +189,8 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo){
  * is passed in.  We want to return 1 on success, 0 on error.
  */
 
-
-unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, int *height){
+unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, int *height)
+{
 	/* This struct contains the JPEG decompression parameters and pointers to
 	 * working space (which is allocated as needed by the JPEG library).
 	 */
@@ -206,7 +212,7 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 	 */
 
 	infile = fopen(filename, "rb");
-	if(!infile){
+	if (!infile) {
 		luaL_error(L, "Could not open %s.\n", filename);
 		return NULL;
 	}
@@ -217,7 +223,7 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 	cinfo.err = jpeg_std_error(&jerr.pub);
 	jerr.pub.error_exit = my_error_exit;
 	/* Establish the setjmp return context for my_error_exit to use. */
-	if(setjmp(jerr.setjmp_buffer)){
+	if (setjmp(jerr.setjmp_buffer)) {
 		/* If we get here, the JPEG code has signaled an error.
 		 * We need to clean up the JPEG object, close the input file, and return.
 		 */
@@ -262,7 +268,7 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 	 * In this example, we need to make an output work buffer of the right size.
 	 */
 	/* JSAMPLEs per row in output buffer */
-	row_stride = cinfo.output_width*cinfo.output_components;
+	row_stride = cinfo.output_width * cinfo.output_components;
 	/* Make a one-row-high sample array that will go away when done with image */
 	buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
 
@@ -272,25 +278,35 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 	/* Here we use the library's state variable cinfo.output_scanline as the
 	 * loop counter, so that we don't have to keep track ourselves.
 	 */
-	int w, h, xi, yi;
+	int w, h, xi, yi, ci;
 
-	*width = w = cinfo.output_width;
+	*width  = w = cinfo.output_width;
 	*height = h = cinfo.output_height;
-	unsigned char *ret = (unsigned char *)malloc((w*h)*sizeof(unsigned int));
-	if(cinfo.out_color_components!=3){
+
+	unsigned char *ret = (unsigned char *)malloc(w * h * sizeof(unsigned int));
+
+	if (cinfo.out_color_components != 3) {
 		luaL_error(L, "Only three-channel images are supported. %s has %i.\n", filename, cinfo.out_color_components);
 		return NULL;
 	}
-	for(yi = 0; yi<h; yi++){
+
+	for (yi = 0; yi < h; yi++) {
 		/* jpeg_read_scanlines expects an array of pointers to scanlines.
 		 * Here the array is only one element long, but you could ask for
 		 * more than one scanline at a time if that's more convenient.
 		 */
 		JSAMPLE *pixelrow = buffer[0];
-		assert((int)cinfo.output_scanline==yi);
+
+		assert((int)cinfo.output_scanline == yi);
+
 		jpeg_read_scanlines(&cinfo, buffer, 1);
-		for(xi = 0; xi<w; xi++){
-			((unsigned int *)ret)[xi+w*yi] = (*((unsigned int *)&pixelrow[xi*3]))|0xFF000000;
+
+		for (xi = 0; xi < w; xi++) {
+			for (ci = 0; ci < 3; ci++) {
+				ret[(xi + w * yi) * 4 + ci] = pixelrow[xi * 3 + ci];
+			}
+
+			ret[(xi + w * yi) * 4 + 3] = 255; /* 100% opaque */
 		}
 	}
 
@@ -345,4 +361,3 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
  * On some systems you may need to set up a signal handler to ensure that
  * temporary files are deleted if the program is interrupted.  See libjpeg.doc.
  */
-
