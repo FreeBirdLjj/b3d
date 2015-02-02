@@ -103,7 +103,7 @@ static const luaL_Reg lualibs[] = {
 	{NULL, NULL},
 };
 
-int file_exists(char filename[]){
+int file_exists(const char filename[]){
 	FILE *file = fopen(filename, "r");
 
 	if(!file){
