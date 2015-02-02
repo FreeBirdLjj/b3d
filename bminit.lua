@@ -62,8 +62,6 @@ local glutReshapeWindow = glut.glutReshapeWindow
 local glutSwapBuffers = glut.glutSwapBuffers
 local glutWireCube = glut.glutWireCube
 
-local load = image.load
-
 local max = math.max
 local min = math.min
 
@@ -203,7 +201,7 @@ local load_thumbnails = function(orient)
 
 	for filename in file:lines() do
 		bm_names[i] = filename:sub(1, -5)
-		bm_thumbnails[i] = load("thumbnails/" .. orient .. "-labelled/" .. filename)
+		bm_thumbnails[i] = image.load("thumbnails/" .. orient .. "-labelled/" .. filename)
 
 		local width, height = bm_thumbnails[i]:get_size()
 
