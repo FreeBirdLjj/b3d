@@ -178,7 +178,7 @@ static void mesh_drawlist(mesh_t *mesh)
 
 	for (i = 0; i < mesh->nt; i++) {
 
-		const float *n = &norms[i * 3];
+		float *n = &norms[i * 3];
 		gl_triangle_t *glt = &gl_tris[i];
 		const int *t = mesh->tris[i].iv;
 
