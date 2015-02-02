@@ -781,29 +781,38 @@ end
 -- Menu
 ---------------
 
-bm.reset_menu()
-bm.add_menu_item("Zoom in (i)", zoom_in)
-bm.add_menu_item("Zoom to fit (f)", zoom_to_fit)
-bm.add_menu_item("Toggle full screen (F)", toggle_full_screen)
-bm.add_menu_item("Toggle transparency (T)", toggle_transparency)
-bm.add_menu_item("Toggle thumbnails (t)", toggle_thumbnails)
-bm.add_menu_item("Toggle position lock (l)", toggle_position_lock)
-bm.add_menu_item("Browse coronal (c)", browse_coronal)
-bm.add_menu_item("Browse horizontal (h)", browse_horizontal)
-bm.add_menu_item("Browse sagittal (s)", browse_sagittal)
-bm.add_menu_item("Browse all three (b)", browse_all_three)
-bm.add_menu_item("X stripes (x)", make_stripe_fun(2, 0, 0, 0))
-bm.add_menu_item("Y stripes (y)", make_stripe_fun(0, 2, 0, 0))
-bm.add_menu_item("Z stripes (z)", make_stripe_fun(0, 0, 2, 0))
-bm.add_menu_item("Cycle through draw styles (m)", cycle_through_draw_styles)
-bm.add_menu_item("No stripes (n)", no_stripes)
-bm.add_menu_item("Load labels (L)", load_labels)
-bm.add_menu_item("Add label (p)", add_mouse_label)
-bm.add_menu_item("Lua prompt (:)", begin_command_mode)
-bm.add_menu_item("Run Lua script", run_user_selected_lua_script)
-bm.add_menu_item("Help (?)", help)
-bm.add_menu_item("Restart (r)", restart)
-bm.add_menu_item("Quit (q)", quit)
+do
+	local menu_items = {
+		{"Zoom in (i)", zoom_in},
+		{"Zoom to fit (f)", zoom_to_fit},
+		{"Toggle full screen (F)", toggle_full_screen},
+		{"Toggle transparency (T)", toggle_transparency},
+		{"Toggle thumbnails (t)", toggle_thumbnails},
+		{"Toggle position lock (l)", toggle_position_lock},
+		{"Browse coronal (c)", browse_coronal},
+		{"Browse horizontal (h)", browse_horizontal},
+		{"Browse sagittal (s)", browse_sagittal},
+		{"Browse all three (b)", browse_all_three},
+		{"X stripes (x)", make_stripe_fun(2, 0, 0, 0)},
+		{"Y stripes (y)", make_stripe_fun(0, 2, 0, 0)},
+		{"Z stripes (z)", make_stripe_fun(0, 0, 2, 0)},
+		{"Cycle through draw styles (m)", cycle_through_draw_styles},
+		{"No stripes (n)", no_stripes},
+		{"Load labels (L)", load_labels},
+		{"Add label (p)", add_mouse_label},
+		{"Lua prompt (:)", begin_command_mode},
+		{"Run Lua script", run_user_selected_lua_script},
+		{"Help (?)", help},
+		{"Restart (r)", restart},
+		{"Quit (q)", quit},
+	}
+
+	bm.reset_menu()
+
+	for _, v in pairs(menu_items) do
+		bm.add_menu_item(v[1], v[2])
+	end
+end
 
 on_mouse = function(button, state, xi, yi)
 	shift_is_pressed = (glutGetModifiers() & GLUT_ACTIVE_SHIFT) ~= 0
