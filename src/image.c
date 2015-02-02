@@ -4,7 +4,7 @@
 
 unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, int *height);
 
-static image_t *luaL_checkimage(lua_State *L, int arg)
+static image_t *luaL_checkimage(lua_State *L, const int arg)
 {
 	image_t *img = (image_t *)luaL_checkudata(L, arg, "brainmaps_image");
 
@@ -28,7 +28,7 @@ static int l_image_load(lua_State *L)
 	return 1;	/* Tell Lua about the image we're returning on its stack. */
 }
 
-static void image_draw_pixels(image_t *im)
+static void image_draw_pixels(const image_t *im)
 {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glDrawPixels(im->nx, im->ny, GL_RGBA, GL_UNSIGNED_BYTE, im->pixels);
