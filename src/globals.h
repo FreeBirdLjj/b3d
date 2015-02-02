@@ -10,7 +10,7 @@
 
 extern const int MAX_LABEL_LEN;
 
-const enum {
+enum {
 	NS_DIV_BY_AREA,
 	NS_NORMALIZE,
 	NS_MUL_BY_AREA,
