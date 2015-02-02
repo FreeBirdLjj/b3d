@@ -888,7 +888,7 @@ local key_bindings = {
 	['l'] = toggle_position_lock,
 	['q'] = quit,
 -- Bring up a lua command prompt, for power users
-	[':'] = begin_command_mode
+	[':'] = begin_command_mode,
 }
 
 on_keyboard = function(key, xi, yi)
