@@ -33,9 +33,11 @@ static int l_add_menu_item(lua_State *L)
 	lua_getglobal(L, "menu_callbacks");
 	lua_pushnumber(L, index);
 	lua_pushvalue(L, -3);		/* copy the callback to the top of the stack */
+
 	assert(lua_istable(L, -3));
 	assert(lua_isnumber(L, -2));
 	assert(lua_isfunction(L, -1));
+
 	lua_settable(L, -3);
 
 	glutAddMenuEntry(luaL_checkstring(L, 1), index);
