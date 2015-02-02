@@ -280,15 +280,17 @@ end
 
 local draw_box_list = glGenLists(1)
 
-glNewList(draw_box_list, GL_COMPILE)
-glPushMatrix()
-glTranslated(center[1], center[2], center[3], 1)
-glScaled(edges[1], edges[2], edges[3])
-glutWireCube(1.0)
-glPopMatrix()
-show_pos(scene_box[1], scene_box[2], scene_box[3])
-show_pos(scene_box[4], scene_box[5], scene_box[6])
-glEndList()
+do
+	glNewList(draw_box_list, GL_COMPILE)
+	glPushMatrix()
+	glTranslated(center[1], center[2], center[3], 1)
+	glScaled(edges[1], edges[2], edges[3])
+	glutWireCube(1.0)
+	glPopMatrix()
+	show_pos(scene_box[1], scene_box[2], scene_box[3])
+	show_pos(scene_box[4], scene_box[5], scene_box[6])
+	glEndList()
+end
 
 local set_up_3D_viewport_and_matrices = function()
 
