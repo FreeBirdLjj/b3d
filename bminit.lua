@@ -1,3 +1,4 @@
+-- Libraries
 local image = require("image")
 local gl = require("gl")
 local glu = require("glu")
@@ -5,7 +6,6 @@ local glut = require("glut")
 local mesh = require("mesh")
 local bm = require("bm")
 
--- Libraries
 local pairs = pairs
 local string = string
 local io = io
