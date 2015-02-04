@@ -464,7 +464,7 @@ on_display = function()
 
 		local wt = bm.coronal_max_width
 
-		glViewport(w-wt-10, 0, wt+10, h)
+		glViewport(w - wt - 10, 0, wt + 10, h)
 		glDisable(GL_DEPTH_TEST)
 
 		glMatrixMode(GL_PROJECTION)
@@ -646,7 +646,6 @@ local toggle_thumbnails = function()
 end
 
 local toggle_position_lock = function()
-
 	if (locked_position ~= nil) then
 		locked_position = nil
 	else
@@ -691,7 +690,7 @@ local cycle_through_draw_styles = (function()
 	local draw_mode_switch = {
 		[GL_FILL] = GL_LINE,
 		[GL_LINE] = GL_POINT,
-		[GL_POINT] = GL_FILL
+		[GL_POINT] = GL_FILL,
 	}
 
 	return function()
@@ -827,7 +826,7 @@ on_motion = function(xi, yi)
 
 	if (shift_is_pressed == true) then
 		-- move camera closer in or further out
-		camera_distance = camera_distance/exp(0.01*(yi-mouse_yi))
+		camera_distance = camera_distance / exp(0.01 * (yi - mouse_yi))
 	elseif (ctrl_is_pressed == true) then
 
 		local h = max(1, glutGet(GLUT_WINDOW_HEIGHT))
@@ -850,8 +849,7 @@ on_motion = function(xi, yi)
 		x_angle_deg = x_angle_deg - 0.5 * (yi - mouse_yi)
 	end
 
-	mouse_xi = xi
-	mouse_yi = yi
+	mouse_xi, mouse_yi = xi, yi
 
 	glutPostRedisplay()
 end
@@ -891,7 +889,7 @@ local key_bindings = {
 	['n'] = no_stripes,
 	['l'] = toggle_position_lock,
 	['q'] = quit,
--- Bring up a lua command prompt, for power users
+	-- Bring up a lua command prompt, for power users
 	[':'] = begin_command_mode,
 }
 
