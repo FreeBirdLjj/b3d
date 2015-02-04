@@ -1,14 +1,16 @@
+local image = require("image")
+local gl = require("gl")
+local glu = require("glu")
+local glut = require("glut")
+local mesh = require("mesh")
+local bm = require("bm")
 
 -- Libraries
 local pairs = pairs
 local string = string
-local gl = gl
-local glu = glu
-local glut = glut
 local io = io
 local math = math
 local os = os
-local bm = bm
 
 -- Functions
 local abs = math.abs

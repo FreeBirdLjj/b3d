@@ -157,7 +157,7 @@ void brainmaps_start_lua(void)
 			fprintf(stderr, "Loading lua lib: %s\n", lib->name);
 		}
 
-		luaL_requiref(lua_state, lib->name, lib->func, 1);	/* open library */
+		luaL_requiref(lua_state, lib->name, lib->func, 0);	/* open library */
 		lua_pop(lua_state, 1);					/* discard any results */
 	}
 
