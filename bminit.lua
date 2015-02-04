@@ -781,34 +781,34 @@ end
 
 do
 	local menu_items = {
-		{ "Zoom in (i)", zoom_in },
-		{ "Zoom to fit (f)", zoom_to_fit },
-		{ "Toggle full screen (F)", toggle_full_screen },
-		{ "Toggle transparency (T)", toggle_transparency },
-		{ "Toggle thumbnails (t)", toggle_thumbnails },
-		{ "Toggle position lock (l)", toggle_position_lock },
-		{ "Browse coronal (c)", browse_coronal },
-		{ "Browse horizontal (h)", browse_horizontal },
-		{ "Browse sagittal (s)", browse_sagittal },
-		{ "Browse all three (b)", browse_all_three },
-		{ "X stripes (x)", make_stripe_fun(2, 0, 0, 0) },
-		{ "Y stripes (y)", make_stripe_fun(0, 2, 0, 0) },
-		{ "Z stripes (z)", make_stripe_fun(0, 0, 2, 0) },
-		{ "Cycle through draw styles (m)", cycle_through_draw_styles },
-		{ "No stripes (n)", no_stripes },
-		{ "Load labels (L)", load_labels },
-		{ "Add label (p)", add_mouse_label },
-		{ "Lua prompt (:)", begin_command_mode },
-		{ "Run Lua script", run_user_selected_lua_script },
-		{ "Help (?)", help },
-		{ "Restart (r)", restart },
-		{ "Quit (q)", quit },
+		{ text="Zoom in (i)", func=zoom_in },
+		{ text="Zoom to fit (f)", func=zoom_to_fit },
+		{ text="Toggle full screen (F)", func=toggle_full_screen },
+		{ text="Toggle transparency (T)", func=toggle_transparency },
+		{ text="Toggle thumbnails (t)", func=toggle_thumbnails },
+		{ text="Toggle position lock (l)", func=toggle_position_lock },
+		{ text="Browse coronal (c)", func=browse_coronal },
+		{ text="Browse horizontal (h)", func=browse_horizontal },
+		{ text="Browse sagittal (s)", func=browse_sagittal },
+		{ text="Browse all three (b)", func=browse_all_three },
+		{ text="X stripes (x)", func=make_stripe_fun(2, 0, 0, 0) },
+		{ text="Y stripes (y)", func=make_stripe_fun(0, 2, 0, 0) },
+		{ text="Z stripes (z)", func=make_stripe_fun(0, 0, 2, 0) },
+		{ text="Cycle through draw styles (m)", func=cycle_through_draw_styles },
+		{ text="No stripes (n)", func=no_stripes },
+		{ text="Load labels (L)", func=load_labels },
+		{ text="Add label (p)", func=add_mouse_label },
+		{ text="Lua prompt (:)", func=begin_command_mode },
+		{ text="Run Lua script", func=run_user_selected_lua_script },
+		{ text="Help (?)", func=help },
+		{ text="Restart (r)", func=restart },
+		{ text="Quit (q)", func=quit },
 	}
 
 	bm.reset_menu()
 
 	for _, v in pairs(menu_items) do
-		bm.add_menu_item(v[1], v[2])
+		bm.add_menu_item(v.text, v.func)
 	end
 end
 
