@@ -173,7 +173,6 @@ local mouse_xi, mouse_yi
 local axes_color, stripe_color, mesh_color, horizontal_plane_color, coronal_plane_color, sagittal_plane_color, label_color
 	= {0, 0, 0, 1}, {1, 0, 0, 1}, {0.9, 0.9, 0.9, 1.0}, {0.0, 0.0, 0.8, 0.3}, {0.7, 0.0, 0.0, 0.3}, {0.7, 0.4, 0.0, 0.3}, {1.0, 6.0, 0.0, 1.0}
 local draw_mode = GL_FILL
-local showing_planes = nil
 local locked_position = nil
 local scene_box = {mesh_obj:get_bounds()}
 local kb_cmd_mode = false
