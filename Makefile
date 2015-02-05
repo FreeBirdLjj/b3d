@@ -1,8 +1,6 @@
 LIB_DIR = lib
 LIBJPEG_DIR = $(LIB_DIR)/jpeg
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
-LIBREADLINE_DIR = $(LIB_DIR)/readline
-LIBREADLINE = $(LIBREADLINE_DIR)/libreadline.a
 LIBLUA_DIR = $(LIB_DIR)/lua
 LIBLUA = $(LIBLUA_DIR)/src/liblua.a
 
