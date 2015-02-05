@@ -232,7 +232,7 @@ load_thumbnails("sagittal")
 -- different if the position is locked.
 local get_mouse_location = function()
 
-	if (locked_position ~= nil) then
+	if locked_position ~= nil then
 		return unpack(locked_position)
 	end
 
@@ -260,8 +260,8 @@ end
 
 local draw_bitmap_string = function(font, s, x, y, z)
 
-	if (x ~= nil) then
-		if (z ~= nil) then
+	if x ~= nil then
+		if z ~= nil then
 			glRasterPosd(x, y, z)
 		else
 			glDepthMask(false)
@@ -320,7 +320,7 @@ end
 
 on_display = function()
 
-	if (doing_transparency == false) then
+	if doing_transparency == false then
 		glEnable(GL_DEPTH_TEST)
 	end
 
@@ -333,14 +333,14 @@ on_display = function()
 	glEnable(GL_LIGHTING)
 	glPushMatrix()
 
-	if (candy_striping == true) then
+	if candy_striping == true then
 		glEnable(GL_TEXTURE_1D)
 		glEnable(GL_TEXTURE_GEN_S)
 	end
 
 	mesh_obj:draw()
 
-	if (candy_striping == true) then
+	if candy_striping == true then
 		glDisable(GL_TEXTURE_1D)
 		glDisable(GL_TEXTURE_GEN_S)
 	end
@@ -353,7 +353,7 @@ on_display = function()
 
 	local x, y, z = get_mouse_location()
 
-	if (locked_position ~= nil) then
+	if locked_position ~= nil then
 
 		glDepthMask(false)
 
@@ -413,14 +413,14 @@ on_display = function()
 	-- Only draw the 3D mouse coords if the mouse is probably over the
 	-- surface.  This hack on the next line should be replaced with something
 	-- smarter.
-	if (x ^ 2 + y ^ 2 + z ^ 2 < (0.75 * zfar) ^ 2) then
+	if x ^ 2 + y ^ 2 + z ^ 2 < (0.75 * zfar) ^ 2 then
 		str = ("Mouse location: (%4.3f, %4.3f, %4.3f)"):format(x, y, z)
 		glRasterPosd(10, h - 20)
 		draw_bitmap_string("h12", str)
 	end
 
 	-- More here: print out other info of interest: frame rate, etc.
-	if (kb_cmd_mode == true) then
+	if kb_cmd_mode == true then
 		glRasterPosd(10, 10)
 		draw_bitmap_string("h12", "lua> " .. command .. "|")
 	end
@@ -429,11 +429,11 @@ on_display = function()
 	glMatrixMode(GL_MODELVIEW)
 	glPopMatrix()
 
-	if (glGetBooleanv(GL_DEPTH_TEST) == GL_TRUE) then
+	if glGetBooleanv(GL_DEPTH_TEST) == GL_TRUE then
 		glEnable(GL_DEPTH_TEST)
 	end
 
-	if (#labels > 0) then
+	if #labels > 0 then
 		glColord(unpack(label_color))
 
 		for _, L in pairs(labels) do
@@ -456,7 +456,7 @@ on_display = function()
 		glColord(0.0, 0.0, 0.0, 1.0)
 	end
 
-	if (drawing_thumbnails == true) then
+	if drawing_thumbnails == true then
 		-- These have to be done while we still have the GL
 		-- matrices and viewport set up from the 3D drawing.
 		local icor, ihor, isag
@@ -496,7 +496,7 @@ on_display = function()
 
 		h = h - 1
 
-		if (cor_img ~= nil) then
+		if cor_img ~= nil then
 			glRasterPosd(1, h)
 			cor_img:draw_pixels()
 		end
@@ -505,7 +505,7 @@ on_display = function()
 
 		local sag_img = bm.sagittal_thumbnails[isag]
 
-		if (sag_img ~= nil) then
+		if sag_img ~= nil then
 			glRasterPosd(1, h)
 			sag_img:draw_pixels()
 		end
@@ -514,7 +514,7 @@ on_display = function()
 
 		local hor_img = bm.horizontal_thumbnails[ihor]
 
-		if (hor_img ~= nil) then
+		if hor_img ~= nil then
 			glRasterPosd(1, h)
 			hor_img:draw_pixels()
 		end
@@ -542,7 +542,7 @@ local run = function(filename)
 
 	local cmd = loadfile(filename)
 
-	if (cmd ~= nil) then
+	if cmd ~= nil then
 		cmd()
 	else
 		bm.warn("Could not run " .. filename)
@@ -562,7 +562,7 @@ local browse_coronal = function()
 	local icor, ihor, isag = get_indexes_from_mouse()
 	local name = bm.coronal_names[icor]
 
-	if (name ~= nil) then
+	if name ~= nil then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH04/RH04a/&file=HBP/m.mulatta/RH04/RH04a/" .. name .. "/&win=max\"")
 	end
 end
@@ -572,7 +572,7 @@ local browse_horizontal = function()
 	local icor, ihor, isag = get_indexes_from_mouse()
 	local name = bm.horizontal_names[ihor]
 
-	if (name ~= nil) then
+	if name ~= nil then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH10/RH10a/&file=HBP/m.mulatta/RH10/RH10a/" .. name .. "/&win=max\"")
 	end
 end
@@ -582,7 +582,7 @@ local browse_sagittal = function()
 	local icor, ihor, isag = get_indexes_from_mouse()
 	local name = bm.sagittal_names[isag]
 
-	if (name ~= nil) then
+	if name ~= nil then
 		bm.run_process_in_background(browser_path .. " " .. "\"http://brainmaps.org/index.php?dirname=HBP/m.mulatta/RH12/RH12a/&file=HBP/m.mulatta/RH12/RH12a/" .. name .. "/&win=max\"")
 	end
 end
@@ -609,7 +609,7 @@ local zoom_in = function()
 		= camera_distance / 4.0, camera_distance
 	local x1, y1, z1 = get_mouse_location()
 
-	if (max(abs(x1), abs(y1), abs(z1)) < 1e4) then
+	if max(abs(x1), abs(y1), abs(z1)) < 1e4 then
 
 		local x0, y0, z0 = unpack(camera_pivot)
 		local cam_off0 = camera_offset
@@ -618,7 +618,7 @@ local zoom_in = function()
 		bm.set_idle_callback(function()
 		        cnt = cnt + 1
 
-			if (cnt > 60) then
+			if cnt > 60 then
 				bm.set_idle_callback(nil)
 			end
 
@@ -646,7 +646,7 @@ local toggle_thumbnails = function()
 end
 
 local toggle_position_lock = function()
-	if (locked_position ~= nil) then
+	if locked_position ~= nil then
 		locked_position = nil
 	else
 		locked_position = {get_mouse_location()}
@@ -696,7 +696,7 @@ local cycle_through_draw_styles = (function()
 	return function()
 		draw_mode = draw_mode_switch[draw_mode]
 
-		if (draw_mode == GL_LINE) then
+		if draw_mode == GL_LINE then
 			glDisable(GL_LINE_SMOOTH)
 		else
 			glEnable(GL_LINE_SMOOTH)
@@ -718,7 +718,7 @@ local toggle_full_screen =  (function()
 	return function()
 		fullscreen = not(fullscreen)
 
-		if (fullscreen) then
+		if fullscreen == true then
 			last_width, last_height = max(1, glutGet(GLUT_WINDOW_WIDTH)), max(1, glutGet(GLUT_WINDOW_HEIGHT))
 			glutFullScreen()
 		else
@@ -750,7 +750,7 @@ local load_labels = function()
 
 	local file = io.open("labels.txt")
 
-	if (file == nil) then
+	if file == nil then
 		print("== Result of wget request ==")
 		os.execute("wget http://brainmaps.org/labels.txt")
 	else
@@ -815,8 +815,8 @@ on_mouse = function(button, state, xi, yi)
 	shift_is_pressed = (glutGetModifiers() & GLUT_ACTIVE_SHIFT) ~= 0
 	ctrl_is_pressed  = (glutGetModifiers() & GLUT_ACTIVE_CTRL ) ~= 0
 
-	if (state == GLUT_DOWN) then
-		if (button == GLUT_LEFT) then
+	if state == GLUT_DOWN then
+		if button == GLUT_LEFT then
 			mouse_xi, mouse_yi = xi, yi
 		end
 	end
@@ -824,10 +824,10 @@ end
 
 on_motion = function(xi, yi)
 
-	if (shift_is_pressed == true) then
+	if shift_is_pressed == true then
 		-- move camera closer in or further out
 		camera_distance = camera_distance / exp(0.01 * (yi - mouse_yi))
-	elseif (ctrl_is_pressed == true) then
+	elseif ctrl_is_pressed == true then
 
 		local h = max(1, glutGet(GLUT_WINDOW_HEIGHT))
 		-- z=0 at near clipping plane (http://www.opengl.org/resources/faq/technical/glu.htm)
@@ -894,18 +894,18 @@ local key_bindings = {
 }
 
 on_keyboard = function(key, xi, yi)
-	if (kb_cmd_mode == true) then
+	if kb_cmd_mode == true then
 		-- If it's Enter, then try to execute the command.
-		if (key == 13) then
+		if key == 13 then
 
 			local loaded_cmd = loadstring(command)
 
-			if (loaded_cmd ~= nil) then
+			if loaded_cmd ~= nil then
 
 				local status, result = pcall(loaded_cmd)
 
-				if (status ~= false) then
-					if (result ~= nil) then
+				if status ~= false then
+					if result ~= nil then
 						print(result)
 					end
 				else
@@ -919,11 +919,11 @@ on_keyboard = function(key, xi, yi)
 
 		-- If it's backspace or delete, then try to delete the last
 		-- character in the command.
-		elseif (key == 8 or key == 127) then
+		elseif key == 8 or key == 127 then
 			command = command:sub(1, -2)
 
 		-- If it's Esc or ctrl-c, then abort the command
-		elseif (key == 27 or key == 3) then
+		elseif key == 27 or key == 3 then
 			kb_cmd_mode = false
 			command = ""
 		else
@@ -934,7 +934,7 @@ on_keyboard = function(key, xi, yi)
 
 		local f = key_bindings[string.char(key)]
 
-		if (f ~= nil) then
+		if f ~= nil then
 			f(xi, yi)
 		end
 	end
