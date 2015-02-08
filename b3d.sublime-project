@@ -2,7 +2,7 @@
 	"folders": [
 	{
 		"follow_symlinks": true,
-		"path": "."
+		"path": ".",
 	}
 	],
 	"build_systems": [
@@ -15,12 +15,12 @@
 		{
 			"name": "Run",
 			"cmd": ["make", "run"],
-		},
-		{
+		}
+		,{
 			"name": "clean",
 			"cmd": ["make", "clean"],
-		},
-		{
+		}
+		,{
 			"name": "distclean",
 			"cmd": ["make", "distclean"],
 		}
