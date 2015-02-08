@@ -1,4 +1,5 @@
-LIB_DIR = lib
+PROJECT_DIR = ..
+LIB_DIR = $(PROJECT_DIR)/lib
 LIBJPEG_DIR = $(LIB_DIR)/jpeg
 LIBJPEG = $(LIBJPEG_DIR)/.libs/libjpeg.a
 LIBLUA_DIR = $(LIB_DIR)/lua
@@ -21,10 +22,10 @@ CFLAGS ?= -O3 -s
 LOADLIBES = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs
 LDLIBS = -llua -ldl -lm -ljpeg $(GLLIBS)
 
-SRC_DIR = src
+SRC_DIR = $(PROJECT_DIR)/src
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(SRCS:.c=.o)
-BIN_DIR = bin
+BIN_DIR = $(PROJECT_DIR)/bin
 BIN = $(BIN_DIR)/b3d
 
 .PHONY: all clean distclean
@@ -38,7 +39,7 @@ $(LIBJPEG):
 	cd $(LIBJPEG_DIR)/ && ./configure --disable-shared && $(MAKE)
 
 $(BIN): $(OBJS)
-	mkdir -p bin/
+	mkdir -p $(BIN_DIR)
 	$(CC) $(CPPFLAGSLGS) $(CFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
 
 run: all
