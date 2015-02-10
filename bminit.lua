@@ -650,11 +650,7 @@ local toggle_thumbnails = function()
 end
 
 local toggle_position_lock = function()
-	if locked_position ~= nil then
-		locked_position = nil
-	else
-		locked_position = {get_mouse_location()}
-	end
+	locked_position = ((locked_position == nil) and {get_mouse_location()}) or nil
 end
 
 -- Parts of this function were borrowed from the OpenGL texgen demo.
