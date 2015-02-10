@@ -181,6 +181,10 @@ local command = ""				-- command being entered by the user
 local candy_striping, doing_transparency, drawing_thumbnails, ctrl_is_pressed, shift_is_pressed
 	= false, false, true, false, false
 
+local warn = function(...)
+	io.stderr:write(string.format(...) .. "\n")
+end
+
 local reverse = function(t)
 
 	local len_t = #t
@@ -545,7 +549,7 @@ local run = function(filename)
 	if cmd ~= nil then
 		cmd()
 	else
-		bm.warn("Could not run " .. filename)
+		warn("Could not run " .. filename)
 	end
 end
 
@@ -909,10 +913,10 @@ on_keyboard = function(key, xi, yi)
 						print(result)
 					end
 				else
-					bm.warn("Lua error. ", result)
+					warn("Lua error. ", result)
 				end
 			else
-				bm.warn("Lua syntax error.")
+				warn("Lua syntax error.")
 			end
 			km_cmd_mode = 0
 			command = ""

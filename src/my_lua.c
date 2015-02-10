@@ -2,13 +2,6 @@
 
 #include "my_lua.h"
 
-static void warn(const char *s)
-{
-	fprintf(stderr, "%s\n", s);
-}
-
-BIND_0_1(warn, string);
-
 static int l_reset_menu(lua_State *L)
 {
 	if (luaL_loadbuffer(L, "menu_callbacks={}", /* strlen */ 17 , "cmd") || lua_pcall(L, 0, 0, 0)) {
@@ -88,7 +81,6 @@ static int l_get_filename(lua_State *L)
 static const struct luaL_Reg bmlib[] = {
 	ENTRY(reset_menu),
 	ENTRY(add_menu_item),
-	ENTRY(warn),
 	ENTRY(get_filename),
 	ENTRY(run_process_in_background),
 	ENTRY(set_idle_callback),
@@ -149,7 +141,7 @@ void brainmaps_start_lua(void)
 	/* Load libraries */
 	luaL_openlibs(lua_state);
 
-	luaL_Reg *lib;
+	const luaL_Reg *lib;
 
 	for (lib = lualibs; lib->func; lib++){
 
