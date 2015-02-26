@@ -8,27 +8,30 @@ LIBLUA = $(LIBLUA_DIR)/src/liblua.a
 OS_NAME = $(shell uname)
 
 LUA_TARGET =
-GLLIBS =
+GL_LDLIBS =
 ifeq ($(OS_NAME),Darwin)
 LUA_TARGET := macosx
-GLLIBS := -framework GLUT -framework OpenGL -framework Cocoa
+GL_LDLIBS := -framework GLUT -framework OpenGL -framework Cocoa
 else ifeq ($(OS_NAME),Linux)
 LUA_TARGET := linux
-GLLIBS := -lglut -lGL -lGLU
+GL_LDLIBS := -lglut -lGL -lGLU
 endif
 
-CPPFLAGS = -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR)
-CFLAGS ?= -O3 -s
-LOADLIBES = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs
-LDLIBS = -llua -ldl -lm -ljpeg $(GLLIBS)
-
+INC_DIR = $(PROJECT_DIR)/include
 SRC_DIR = $(PROJECT_DIR)/src
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(SRCS:.c=.o)
 BIN_DIR = $(PROJECT_DIR)/bin
 BIN = $(BIN_DIR)/b3d
 
-.PHONY: all clean distclean
+INC = -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR) -I$(INC_DIR)
+
+CPPFLAGS = $(INC) $(MY_CPPFLAGS)
+CFLAGS ?= -O3 -s
+LOADLIBES = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs
+LDLIBS = -llua -ldl -lm -ljpeg $(GL_LDLIBS)
+
+.PHONY: all run clean distclean
 
 all: $(LIBLUA) $(LIBJPEG) $(BIN)
 
@@ -49,5 +52,5 @@ clean:
 	$(RM) -r $(OBJS) $(BIN_DIR)
 
 distclean: clean
-	cd $(LIBLUA_DIR); make clean
-	cd $(LIBJPEG_DIR); make distclean
+	cd $(LIBLUA_DIR); $(MAKE) clean
+	cd $(LIBJPEG_DIR); $(MAKE) distclean
