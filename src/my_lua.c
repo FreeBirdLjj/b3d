@@ -143,7 +143,7 @@ void brainmaps_start_lua(void)
 
 	const luaL_Reg *lib;
 
-	for (lib = lualibs; lib->func; lib++){
+	for (lib = lualibs; lib->func; lib++) {
 
 		if (verbosity) {
 			fprintf(stderr, "Loading lua lib: %s\n", lib->name);
