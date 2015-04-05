@@ -11,18 +11,19 @@ BIND_0_4(gluOrtho2D, number, number, number, number)
 BIND_0_4(gluPerspective, number, number, number, number)
 
 /* The viewport argument is optional. */
-int l_gluPickMatrix(lua_State *L){
+int l_gluPickMatrix(lua_State *L)
+{
 	int i;
 	GLint viewport[4];
 
-	if(lua_gettop(L)==8){
-		for(i = 0; i<4; i++){
-			viewport[i] = luaL_checkinteger(L, i+5);
+	if (lua_gettop(L) == 8) {
+		for (i = 0; i < 4; i++) {
+			viewport[i] = luaL_checkinteger(L, i + 5);
 		}
-	}
-	else{
+	} else {
 		glGetIntegerv(GL_VIEWPORT,viewport);
 	}
+
 	gluPickMatrix(
 		luaL_checknumber(L, 1),
 		luaL_checknumber(L, 2),
@@ -35,14 +36,15 @@ int l_gluPickMatrix(lua_State *L){
 }
 
 /* The model, proj, and view arguments are omitted. */
-int l_gluProject(lua_State *L){
+int l_gluProject(lua_State *L)
+{
 	GLint viewport[4];
 	GLdouble model[16], proj[16], x, y, z;
 
 	glGetDoublev(GL_MODELVIEW_MATRIX, model);
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	if(!gluProject(luaL_checknumber(L, 1),	luaL_checknumber(L, 2),	luaL_checknumber(L, 3),	model, proj, viewport, &x, &y, &z)){
+	if (!gluProject(luaL_checknumber(L, 1),	luaL_checknumber(L, 2),	luaL_checknumber(L, 3),	model, proj, viewport, &x, &y, &z)) {
 		luaL_error(L, "gluProject() failed");
 	}
 
@@ -54,14 +56,15 @@ int l_gluProject(lua_State *L){
 }
 
 /* The model, proj, and view arguments are omitted. */
-int l_gluUnProject(lua_State *L){
+int l_gluUnProject(lua_State *L)
+{
 	GLint viewport[4];
 	GLdouble model[16], proj[16], x, y, z;
 
 	glGetDoublev(GL_MODELVIEW_MATRIX, model);
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	if(!gluUnProject(luaL_checknumber(L, 1), luaL_checknumber(L, 2), luaL_checknumber(L, 3), model, proj, viewport, &x, &y, &z)){
+	if (!gluUnProject(luaL_checknumber(L, 1), luaL_checknumber(L, 2), luaL_checknumber(L, 3), model, proj, viewport, &x, &y, &z)) {
 		luaL_error(L, "gluUnProject() failed");
 	}
 
@@ -86,8 +89,9 @@ static const struct luaL_Reg glu_lib[] = {
 	{NULL, NULL},
 };
 
-int luaopen_glu(lua_State *L){
+LUALIB_API int luaopen_glu(lua_State *L)
+{
 	luaL_newlib(L, glu_lib);
+
 	return 1;
 }
-

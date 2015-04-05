@@ -3,19 +3,22 @@
 /* GLUT initialization sub-API. */
 
 /* Just pass the strings in argv as arguments, not the count. */
-int l_glutInit(lua_State *L){
+static int l_glutInit(lua_State *L)
+{
 	int i;
 	int argc = lua_gettop(L), saved_argc = lua_gettop(L);
-	char **argv = (char **)calloc(argc+1, sizeof(char *));
+	char **argv = (char **)calloc(argc + 1, sizeof(char *));
 
-	for(i = 0; i<argc; i++){
-		argv[i] = strdup(luaL_checkstring(L, i+1));
+	for (i = 0; i < argc; i++) {
+		argv[i] = strdup(luaL_checkstring(L, i + 1));
 	}
+
 	glutInit(&argc, argv);
 
-	for(i = 0; i<saved_argc; i++){
+	for (i = 0; i < saved_argc; i++) {
 		free(argv[i]);
 	}
+
 	free(argv);
 
 	return 0;
@@ -121,7 +124,8 @@ BIND_1_1(number, glutLayerGet, integer)
 	(strcmp(s, "h18")==0)?  GLUT_BITMAP_HELVETICA_18 :	\
 	(luaL_error(L, "Unrecognized font: %s", s), /* ignored */GLUT_BITMAP_HELVETICA_18)
 
-int l_glutBitmapCharacter(lua_State *L){
+static int l_glutBitmapCharacter(lua_State *L)
+{
 	const char *font_name = luaL_checkstring(L, 1);
 
 	glutBitmapCharacter(STRING_TO_FONT(L, font_name), luaL_checkinteger(L, 2));
@@ -129,31 +133,34 @@ int l_glutBitmapCharacter(lua_State *L){
 	return 0;
 }
 
-int l_glutBitmapWidth(lua_State *L){
+static int l_glutBitmapWidth(lua_State *L)
+{
 	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
 
-	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutBitmapWidth must be a string of length 1.");
+	luaL_argcheck(L, strlen(c) == 1, 2, "The second argument to glutBitmapWidth must be a string of length 1.");
 	glutBitmapWidth(STRING_TO_FONT(L, font_name), (int)c[0]);
 
 	return 0;
 }
 
-int l_glutStrokeCharacter(lua_State *L){
+static int l_glutStrokeCharacter(lua_State *L)
+{
 	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
 
-	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutStrokeCharacter must be a string of length 1.");
+	luaL_argcheck(L, strlen(c) == 1, 2, "The second argument to glutStrokeCharacter must be a string of length 1.");
 	glutStrokeCharacter(STRING_TO_FONT(L, font_name), (int)c[0]);
 
 	return 0;
 }
 
-int l_glutStrokeWidth(lua_State *L){
+static int l_glutStrokeWidth(lua_State *L)
+{
 	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
 
-	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutStrokeWidth must be a string of length 1.");
+	luaL_argcheck(L, strlen(c) == 1, 2, "The second argument to glutStrokeWidth must be a string of length 1.");
 	glutStrokeWidth(STRING_TO_FONT(L, font_name), (int)c[0]);
 
 	return 0;
@@ -329,7 +336,7 @@ static const struct luaL_Reg glut_lib[] = {
 	{NULL, NULL},
 };
 
-int luaopen_glut(lua_State *L)
+LUALIB_API int luaopen_glut(lua_State *L)
 {
 	luaL_newlib(L, glut_lib);
 

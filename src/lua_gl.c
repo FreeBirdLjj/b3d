@@ -52,8 +52,9 @@
 BIND_0_1(glBegin, integer);
 BIND_0_0(glEnd)
 
-int l_glVertexd(lua_State *L){
-	switch(lua_gettop(L)){
+static int l_glVertexd(lua_State *L)
+{
+	switch (lua_gettop(L)) {
 	case 2:
 		glVertex2d(luaL_checknumber(L, 1), luaL_checknumber(L, 2));
 		break;
@@ -82,8 +83,9 @@ int l_glVertexd(lua_State *L){
 
 BIND_0_3(glNormal3d, number, number, number)
 
-int l_glColord(lua_State *L){
-	switch(lua_gettop(L)){
+static int l_glColord(lua_State *L)
+{
+	switch (lua_gettop(L)) {
 	case 3:
 		glColor3d(
 			luaL_checknumber(L, 1),
@@ -107,8 +109,9 @@ int l_glColord(lua_State *L){
 	return 0;
 }
 
-int l_glRasterPosd(lua_State *L){
-	switch(lua_gettop(L)){
+static int l_glRasterPosd(lua_State *L)
+{
+	switch (lua_gettop(L)) {
 	case 2:
 		glRasterPos2d(luaL_checknumber(L, 1), luaL_checknumber(L, 2));
 		break;
@@ -135,8 +138,9 @@ int l_glRasterPosd(lua_State *L){
 	return 0;
 }
 
-int l_glTexCoordd(lua_State *L){
-	switch(lua_gettop(L)){
+static int l_glTexCoordd(lua_State *L)
+{
+	switch (lua_gettop(L)) {
 	case 1:
 		glTexCoord1d(luaL_checknumber(L, 1));
 		break;
@@ -168,9 +172,11 @@ int l_glTexCoordd(lua_State *L){
 
 BIND_0_4(glRectd, number, number, number, number);
 
-int l_glMaterial(lua_State *L){
+static int l_glMaterial(lua_State *L)
+{
 	GLenum pname = luaL_checkinteger(L, 2);
-	switch(pname){
+
+	switch (pname) {
 	case GL_AMBIENT:
 	case GL_DIFFUSE:
 	case GL_SPECULAR:
@@ -226,15 +232,17 @@ BIND_0_4(glRotated, number, number, number, number)
 BIND_0_3(glScaled, number, number, number)
 BIND_0_3(glTranslated, number, number, number)
 
-static void make_gl_matrix_from_lua_stack(lua_State *L, GLdouble m[16]){
+static void make_gl_matrix_from_lua_stack(lua_State *L, GLdouble m[16])
+{
 	int i;
 
-	for(i = 0; i<16; i++){
-		m[i] = luaL_checknumber(L, i+1);
+	for (i = 0; i < 16; i++){
+		m[i] = luaL_checknumber(L, i + 1);
 	}
 }
 
-int l_glLoadMatrixd(lua_State *L){
+static int l_glLoadMatrixd(lua_State *L)
+{
 	GLdouble m[16];
 
 	make_gl_matrix_from_lua_stack(L, m);
@@ -243,7 +251,8 @@ int l_glLoadMatrixd(lua_State *L){
 	return 0;
 }
 
-int l_glMultMatrixd(lua_State *L){
+static int l_glMultMatrixd(lua_State *L)
+{
 	GLdouble m[16];
 
 	make_gl_matrix_from_lua_stack(L, m);
@@ -255,22 +264,26 @@ int l_glMultMatrixd(lua_State *L){
 #define ARRAYSIZE_REF	2					/* array sizes */
 
 /* convert a stack index to positive */
-#define abs_index(L, i)	((((i)>0)||((i)<=LUA_REGISTRYINDEX))? (i) : lua_gettop(L)+(i)+1)
+#define abs_index(L, i)	(((i) > 0 || (i) <= LUA_REGISTRYINDEX)? (i) : lua_gettop(L) + (i) + 1)
 
-static int checkint (lua_State *L, int topop) {
+static int checkint (lua_State *L, int topop)
+{
 	int n = (int)lua_tonumber(L, -1);
 
-	if((n==0)&&(!lua_isnumber(L, -1))){
+	if (n == 0 && !lua_isnumber(L, -1)) {
 		n = -1;
 	}
+
 	lua_pop(L, topop);
 
 	return n;
 }
 
-static void getsizes(lua_State *L){
+static void getsizes(lua_State *L)
+{
 	lua_rawgeti(L, LUA_REGISTRYINDEX, ARRAYSIZE_REF);
-	if (lua_isnil(L, -1)){					/* no `size' table? */
+
+	if (lua_isnil(L, -1)) {					/* no `size' table? */
 		lua_pop(L, 1);					/* remove nil */
 		lua_newtable(L);				/* create it */
 		lua_pushvalue(L, -1);				/* `size' will be its own metatable */
@@ -283,41 +296,51 @@ static void getsizes(lua_State *L){
 	}
 }
 
-int luaL_getn(lua_State *L, int t){
+static int luaL_getn(lua_State *L, int t)
+{
 	int n;
 
 	t = abs_index(L, t);
 	lua_pushliteral(L, "n");				/* try t.n */
 	lua_rawget(L, t);
 	n = checkint(L, 1);
-	if(n>=0){
+
+	if (n >= 0) {
 		return n;
 	}
+
 	getsizes(L);						/* else try sizes[t] */
 	lua_pushvalue(L, t);
 	lua_rawget(L, -2);
-	if((n = checkint(L, 2))>=0){
+
+	if ((n = checkint(L, 2)) >= 0) {
 		return n;
 	}
-	for(n = 1; 1; n++){					/* else must count elements */
+
+	for (n = 1; 1; n++) {					/* else must count elements */
 		lua_rawgeti(L, t, n);
-		if(lua_isnil(L, -1)){
+
+		if (lua_isnil(L, -1)) {
 			break;
 		}
+
 		lua_pop(L, 1);
 	}
+
 	lua_pop(L, 1);
 
-	return n-1;
+	return n - 1;
 }
 
-GLfloat *float_array_from_table_in_final_arg(lua_State *L, int *n){
+static GLfloat *float_array_from_table_in_final_arg(lua_State *L, int *n)
+{
 	int i;
 
-	*n = luaL_getn(L, -1);
-	GLfloat *ret = (GLfloat *)malloc((*n)*sizeof(ret[0]));
-	for(i = 0; i<*n; i++){
-		lua_pushnumber(L, i+1);
+	n[0] = luaL_getn(L, -1);
+	GLfloat *ret = (GLfloat *)malloc(n[0] * sizeof(ret[0]));
+
+	for (i = 0; i < n[0]; i++) {
+		lua_pushnumber(L, i + 1);
 		lua_gettable(L, -2);
 		ret[i] = luaL_checknumber(L, -1);
 		lua_pop(L, 1);
@@ -327,16 +350,18 @@ GLfloat *float_array_from_table_in_final_arg(lua_State *L, int *n){
 }
 
 /* Need to test this... -ijt */
-int l_glInterleavedArrays_n3f_v3f(lua_State *L){
+static int l_glInterleavedArrays_n3f_v3f(lua_State *L)
+{
 	int i, n = luaL_getn(L, 2);
 
-	if(n%6){
+	if (n % 6 > 0){
 		luaL_error(L, "Bad array size for glInterleavedArrays_n3f_v3f(): expected a multiple of six.");
 	}
 
-	GLfloat *data = malloc(n*sizeof(GLfloat));
-	for(i = 0; i<n; i++){
-		lua_pushnumber(L, i+1);
+	GLfloat *data = malloc(n * sizeof(GLfloat));
+
+	for (i = 0; i < n; i++) {
+		lua_pushnumber(L, i + 1);
 		lua_gettable(L, 2);
 		data[i] = luaL_checknumber(L, 3);
 		lua_pop(L, 1);
@@ -363,7 +388,8 @@ BIND_0_1(glFrontFace, integer)
 BIND_0_1(glDrawBuffer, integer)
 BIND_0_1(glReadBuffer, integer)
 
-int l_glEdgeFlag(lua_State *L){
+static int l_glEdgeFlag(lua_State *L)
+{
 	glEdgeFlag(lua_toboolean(L, 1));
 
 	return 0;
@@ -383,25 +409,28 @@ BIND_0_2(glPolygonOffset, number, number);
 
 BIND_0_4(glScissor, integer, integer, integer, integer);
 
-int l_glClipPlane(lua_State *L){
+static int l_glClipPlane(lua_State *L)
+{
 	GLdouble coeffs[4];
 	int i;
 
-	for(i = 0; i<3; i++){
-		coeffs[0] = luaL_checknumber(L, i+2);
+	for (i = 0; i < 3; i++) {
+		coeffs[0] = luaL_checknumber(L, i + 2);
 	}
+
 	glClipPlane(luaL_checkinteger(L, 1), coeffs);
 
 	return 0;
 }
 
-int l_glGetClipPlane(lua_State *L){
+static int l_glGetClipPlane(lua_State *L)
+{
 	int i;
 	GLdouble coeffs[4];
 
 	glGetClipPlane(luaL_checkinteger(L, 1), coeffs);
 
-	for(i = 0; i<4; i++){
+	for (i = 0; i < 4; i++) {
 		lua_pushnumber(L, coeffs[i]);
 	}
 
@@ -410,32 +439,36 @@ int l_glGetClipPlane(lua_State *L){
 
 BIND_1_1(integer, glIsEnabled, integer)
 
-int l_glGetDoublev(lua_State *L){
+static int l_glGetDoublev(lua_State *L)
+{
 	GLdouble params[16];
 	int i;
 
-	for(i = 0; i<16; i++){
+	for (i = 0; i < 16; i++) {
 		params[i] = DBL_MAX;
 	}
+
 	glGetDoublev(luaL_checkinteger(L, 1), params);
 
-	for(i = 0; (i<16)&&(params[i]!=DBL_MAX); i++){
+	for (i = 0; i < 16 && params[i] != DBL_MAX; i++) {
 		lua_pushnumber(L, params[i]);
 	}
 
 	return i;
 }
 
-int l_glGetBooleanv(lua_State *L){
+static int l_glGetBooleanv(lua_State *L)
+{
 	GLboolean params[16];
 	int i;
 
-	for(i = 0; i<16; i++){
-		params[i] = ~0;
+	for (i = 0; i < 16; i++) {
+		params[i] = (GLboolean)~0;
 	}
+
 	glGetBooleanv(luaL_checkinteger(L, 1), params);
 
-	for(i = 0; (i<16)&&(params[i]!=(~0)); i++){
+	for (i = 0; i < 16 && params[i] != (GLboolean)~0; i++) {
 		lua_pushnumber(L, params[i]);
 	}
 
@@ -450,13 +483,15 @@ BIND_0_0(glPopClientAttrib)
 
 BIND_1_1(integer, glRenderMode, integer)
 
-int l_glGetError(lua_State *L){
+static int l_glGetError(lua_State *L)
+{
 	lua_pushnumber(L, glGetError());
 
 	return 1;
 }
 
-int l_glGetString(lua_State *L){
+static int l_glGetString(lua_State *L)
+{
 	lua_pushstring(L, (char const *)glGetString(luaL_checkinteger(L, 1)));
 
 	return 1;
@@ -473,7 +508,8 @@ BIND_0_2(glHint, integer, integer)
 BIND_0_1(glClearDepth, integer)
 BIND_0_1(glDepthFunc, integer)
 
-int l_glDepthMask(lua_State *L){
+static int l_glDepthMask(lua_State *L)
+{
 	luaL_checktype(L, 1, LUA_TBOOLEAN);
 	glDepthMask(lua_toboolean(L, 1));
 
@@ -510,23 +546,29 @@ BIND_0_3(glLightf, integer, integer, number);
 BIND_0_2(glLightModelf, integer, number);
 BIND_0_2(glColorMaterial, integer, integer);
 
-int l_glLightModelfv(lua_State *L){
+static int l_glLightModelfv(lua_State *L)
+{
 	int i;
 	GLfloat params[4];
 
-	for(i = 0; i<4; i++)
-		params[i] = luaL_checknumber(L, i+2);
+	for (i = 0; i < 4; i++) {
+		params[i] = luaL_checknumber(L, i + 2);
+	}
+
 	glLightModelfv(luaL_checkinteger(L, 1), params);
 
 	return 0;
 }
 
-int l_glLightv(lua_State *L){
+static int l_glLightv(lua_State *L)
+{
 	int i;
 	GLfloat params[4];
 
-	for(i = 0; i<4; i++)
-		params[i] = luaL_checknumber(L, i+3);
+	for (i = 0; i < 4; i++) {
+		params[i] = luaL_checknumber(L, i + 3);
+	}
+
 	glLightfv(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2), params);
 
 	return 0;
@@ -544,7 +586,8 @@ BIND_0_2(glPixelTransferf, integer, number)
 BIND_0_2(glPixelTransferi, integer, integer)
 
 /* The pixels are returned on the Lua stack, not in a table. */
-int l_glReadPixels(lua_State *L){
+static int l_glReadPixels(lua_State *L)
+{
 	GLsizei w = luaL_checkinteger(L, 3), h = luaL_checkinteger(L, 4);
 	GLfloat *pixels = malloc(w*h*sizeof(GLfloat));
 	int i;
@@ -558,20 +601,21 @@ int l_glReadPixels(lua_State *L){
 		pixels
 	);
 
-	for(i = 0; i<w*h; i++){
+	for (i = 0; i < w * h; i++) {
 		lua_pushnumber(L, pixels[i]);
 	}
 
 	free(pixels);
 
-	return w*h;
+	return w * h;
 }
 
-int l_glDrawPixels(lua_State *L){
+static int l_glDrawPixels(lua_State *L)
+{
 	int n;
 	GLfloat *pixels = float_array_from_table_in_final_arg(L, &n);
 
-	luaL_argcheck(L, luaL_checkinteger(L, 4)==GL_FLOAT, 4, "Only GL_FLOAT is currently supported for the type in glDrawPixels.");
+	luaL_argcheck(L, luaL_checkinteger(L, 4) == GL_FLOAT, 4, "Only GL_FLOAT is currently supported for the type in glDrawPixels.");
 	glDrawPixels(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2), luaL_checkinteger(L, 3), luaL_checkinteger(L, 4), pixels);
 
 	free(pixels);
@@ -595,16 +639,20 @@ BIND_0_1(glClearStencil, integer)
  * Texture mapping
  */
 
-int l_glTexGen(lua_State *L){
+static int l_glTexGen(lua_State *L)
+{
 	int i, nparams = lua_gettop(L)-2;
 
-	if(nparams<1){
+	if (nparams < 1) {
 		luaL_error(L, "Too few params passed to glTexGen");
 	}
+
 	GLdouble *params = calloc(nparams, sizeof(GLdouble));
-	for(i = 0; i<nparams; i++){
+
+	for (i = 0; i < nparams; i++) {
 		params[i] = luaL_checknumber(L, i+3);
 	}
+
 	glTexGendv(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2), params);
 
 	free(params);
@@ -618,11 +666,12 @@ BIND_0_3(glTexEnvi, integer, integer, integer)
 BIND_0_3(glTexParameterf, integer, integer, number)
 BIND_0_3(glTexParameteri, integer, integer, integer)
 
-int l_gluBuild1DMipmaps(lua_State *L){
+static int l_gluBuild1DMipmaps(lua_State *L)
+{
 	int n;
 	GLfloat *pixels = float_array_from_table_in_final_arg(L, &n);
 
-	luaL_argcheck(L, luaL_checkinteger(L, 5)==GL_FLOAT, 5, "The type argument of glTexImage1D should be GL_FLOAT, since it is the only\ntype that is currently supported.\n");
+	luaL_argcheck(L, luaL_checkinteger(L, 5) == GL_FLOAT, 5, "The type argument of glTexImage1D should be GL_FLOAT, since it is the only\ntype that is currently supported.\n");
 	gluBuild1DMipmaps(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2), luaL_checkinteger(L, 3), luaL_checkinteger(L, 4), luaL_checkinteger(L, 5), pixels);
 
 	free(pixels);
@@ -630,11 +679,12 @@ int l_gluBuild1DMipmaps(lua_State *L){
 	return 0;
 }
 
-int l_glTexImage1D(lua_State *L){
+static int l_glTexImage1D(lua_State *L)
+{
 	int n;
 	GLfloat *pixels = float_array_from_table_in_final_arg(L, &n);
 
-	luaL_argcheck(L, luaL_checkinteger(L, 7)==GL_FLOAT, 7, "The type argument of glTexImage1D should be GL_FLOAT, since it is the only\ntype that is currently supported.\n");
+	luaL_argcheck(L, luaL_checkinteger(L, 7) == GL_FLOAT, 7, "The type argument of glTexImage1D should be GL_FLOAT, since it is the only\ntype that is currently supported.\n");
 	glTexImage1D(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2), luaL_checkinteger(L, 3), luaL_checkinteger(L, 4), luaL_checkinteger(L, 5), luaL_checkinteger(L, 6), luaL_checkinteger(L, 7), pixels);
 
 	free(pixels);
@@ -642,11 +692,12 @@ int l_glTexImage1D(lua_State *L){
 	return 0;
 }
 
-int l_glTexImage2D(lua_State *L){
+int l_glTexImage2D(lua_State *L)
+{
 	int n;
 	GLfloat *pixels = float_array_from_table_in_final_arg(L, &n);
 
-	luaL_argcheck(L, luaL_checkinteger(L, 8)==GL_FLOAT, 8, "The type argument of glTexImage2D should be GL_FLOAT, since it is the only\ntype that is currently supported.\n");
+	luaL_argcheck(L, luaL_checkinteger(L, 8) == GL_FLOAT, 8, "The type argument of glTexImage2D should be GL_FLOAT, since it is the only\ntype that is currently supported.\n");
 	glTexImage2D(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2), luaL_checkinteger(L, 3), luaL_checkinteger(L, 4), luaL_checkinteger(L, 5), luaL_checkinteger(L, 6), luaL_checkinteger(L, 7), luaL_checkinteger(L, 8), pixels);
 
 	free(pixels);
@@ -663,14 +714,15 @@ int l_glTexImage2D(lua_State *L){
  * t1,t2 = glGenTextures(2)
  *
  */
-int l_glGenTextures(lua_State *L){
+static int l_glGenTextures(lua_State *L)
+{
 	int i;
 	GLsizei n = luaL_checkinteger(L, 1);
 	GLuint *textures = calloc(n, sizeof(textures[0]));
 
 	glGenTextures(n, textures);
 
-	for(i = 0; i<n; i++){
+	for (i = 0; i < n; i++) {
 		lua_pushnumber(L, textures[i]);
 	}
 
@@ -683,12 +735,13 @@ int l_glGenTextures(lua_State *L){
  * The number of textures must not be included in the argument list,
  * unlike the C version of glDeleteTextures.
  */
-int l_glDeleteTextures(lua_State *L){
+static int l_glDeleteTextures(lua_State *L)
+{
 	int i;
 	int n = lua_gettop(L);
 	GLuint *textures = calloc(n, sizeof(textures[0]));
 
-	for(i = 1; i<=n; i++){
+	for (i = 1; i <= n; i++) {
 		textures[i-1] = luaL_checkinteger(L, i);
 	}
 
@@ -714,12 +767,13 @@ BIND_0_8(glCopyTexSubImage2D, integer, integer, integer, integer, integer, integ
 BIND_0_2(glFogf, integer, number)
 BIND_0_2(glFogi, integer, integer)
 
-int l_glFogfv(lua_State *L){
+static int l_glFogfv(lua_State *L)
+{
 	int n;
 	GLfloat *params = float_array_from_table_in_final_arg(L, &n);
 
-	luaL_argcheck(L, lua_tonumber(L, 1)==GL_FOG_COLOR, 1, "The first argument to glFogfv should be GL_FOG_COLOR.");
-	luaL_argcheck(L, n==4, 2, "There should be five arguments to glFogfv, the last four being color components.");
+	luaL_argcheck(L, lua_tonumber(L, 1) == GL_FOG_COLOR, 1, "The first argument to glFogfv should be GL_FOG_COLOR.");
+	luaL_argcheck(L, n == 4, 2, "There should be five arguments to glFogfv, the last four being color components.");
 	glFogfv(luaL_checkinteger(L, 1), params);
 
 	free(params);
@@ -861,9 +915,8 @@ static const struct luaL_Reg gl_lib[] = {
 	{NULL, NULL},
 };
 
-
-int luaopen_gl(lua_State *L){
+LUALIB_API int luaopen_gl(lua_State *L)
+{
 	luaL_newlib(L, gl_lib);
 	return 1;
 }
-

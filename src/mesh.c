@@ -392,7 +392,7 @@ static void mesh_gc(mesh_t *m)
 
 BIND_0_1(mesh_gc, mesh)
 
-int luaopen_mesh(lua_State *L)
+LUALIB_API int luaopen_mesh(lua_State *L)
 {
 	luaL_newmetatable(L, "brainmaps_mesh");
 

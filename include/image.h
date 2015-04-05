@@ -23,6 +23,6 @@ typedef struct {
 	GLuint gl_texture_name;
 } image_t;
 
-int lua_openimage(lua_State *L);
+LUALIB_API int lua_openimage(lua_State *L);
 
 #endif

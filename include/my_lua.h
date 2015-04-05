@@ -19,6 +19,6 @@
 #include "lua_glu.h"
 #include "lua_glut.h"
 
-void brainmaps_start_lua(void);
+LUALIB_API void brainmaps_start_lua(void);
 
 #endif

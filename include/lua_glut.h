@@ -12,6 +12,6 @@
 #include "my_lua.h"
 #include "lua_bind.h"
 
-int luaopen_glut(lua_State *L);
+LUALIB_API int luaopen_glut(lua_State *L);
 
 #endif

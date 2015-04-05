@@ -76,7 +76,7 @@ static void image_gc(image_t *im)
 
 BIND_0_1(image_gc, image)
 
-int lua_openimage(lua_State *L)
+LUALIB_API int lua_openimage(lua_State *L)
 {
 	luaL_newmetatable(L, "brainmaps_image");
 
