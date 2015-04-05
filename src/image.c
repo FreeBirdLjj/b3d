@@ -8,7 +8,7 @@ static image_t *luaL_checkimage(lua_State *L, const int arg)
 {
 	image_t *img = (image_t *)luaL_checkudata(L, arg, "brainmaps_image");
 
-	luaL_argcheck(L, img != NULL, 1, "`image' expected");
+	luaL_argcheck(L, img != NULL, arg, "`image' expected");
 
 	return img;
 }
