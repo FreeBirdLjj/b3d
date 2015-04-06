@@ -27,7 +27,7 @@ BIN = $(BIN_DIR)/b3d
 INC = -I$(LIBLUA_DIR)/src -I$(LIBJPEG_DIR) -I$(INC_DIR)
 
 CPPFLAGS = $(INC) $(MY_CPPFLAGS)
-CFLAGS ?= -O3 -s
+CFLAGS ?= -Ofast -s -funroll-loops -flto
 LOADLIBES = -L$(LIBLUA_DIR)/src -L$(LIBJPEG_DIR)/.libs
 LDLIBS = -llua -ldl -lm -ljpeg $(GL_LDLIBS)
 
