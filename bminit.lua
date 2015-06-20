@@ -419,14 +419,12 @@ on_display = function()
 	-- smarter.
 	if x ^ 2 + y ^ 2 + z ^ 2 < (0.75 * zfar) ^ 2 then
 		str = ("Mouse location: (%4.3f, %4.3f, %4.3f)"):format(x, y, z)
-		glRasterPosd(10, h - 20)
-		draw_bitmap_string("h12", str)
+		draw_bitmap_string("h12", str, 10, h - 20)
 	end
 
 	-- More here: print out other info of interest: frame rate, etc.
 	if kb_cmd_mode == true then
-		glRasterPosd(10, 10)
-		draw_bitmap_string("h12", "lua> " .. command .. "|")
+		draw_bitmap_string("h12", "lua> " .. command .. "|", 10, 10)
 	end
 
 	glPopMatrix()
