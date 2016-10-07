@@ -283,12 +283,12 @@ unsigned char *read_JPEG_file(lua_State *L, const char *filename, int *width, in
 	*width  = w = cinfo.output_width;
 	*height = h = cinfo.output_height;
 
-	unsigned char *ret = (unsigned char *)malloc(w * h * sizeof(unsigned int));
-
 	if (cinfo.out_color_components != 3) {
 		luaL_error(L, "Only three-channel images are supported. %s has %i.\n", filename, cinfo.out_color_components);
 		return NULL;
 	}
+
+	unsigned char *ret = (unsigned char *)malloc(w * h * sizeof(unsigned int));
 
 	for (yi = 0; yi < h; yi++) {
 		/* jpeg_read_scanlines expects an array of pointers to scanlines.
