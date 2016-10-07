@@ -16,13 +16,13 @@
 #include "my_lua.h"
 
 /* rgba image type */
-typedef struct{
+typedef struct {
 	int nx, ny;
 	GLubyte *pixels;
 	GLboolean texture_is_valid;
 	GLuint gl_texture_name;
-}image_t;
+} image_t;
 
-int lua_openimage(lua_State *L);
+LUALIB_API int lua_openimage(lua_State *L);
 
 #endif

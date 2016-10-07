@@ -36,6 +36,6 @@ typedef struct{
 	GLfloat pmax[3];	/* max corner point */
 }mesh_t;
 
-int luaopen_mesh(lua_State *L);
+LUALIB_API int luaopen_mesh(lua_State *L);
 
 #endif

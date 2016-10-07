@@ -3,61 +3,52 @@
 /* GLUT initialization sub-API. */
 
 /* Just pass the strings in argv as arguments, not the count. */
-int l_glutInit(lua_State *L){
+static int l_glutInit(lua_State *L)
+{
 	int i;
 	int argc = lua_gettop(L), saved_argc = lua_gettop(L);
-	char **argv = (char **)calloc(argc+1, sizeof(char *));
+	char **argv = (char **)calloc(argc + 1, sizeof(char *));
 
-	for(i = 0; i<argc; i++){
-		argv[i] = strdup(luaL_checkstring(L, i+1));
+	for (i = 0; i < argc; i++) {
+		argv[i] = strdup(luaL_checkstring(L, i + 1));
 	}
+
 	glutInit(&argc, argv);
-	
-	for(i = 0; i<saved_argc; i++){
+
+	for (i = 0; i < saved_argc; i++) {
 		free(argv[i]);
 	}
+
 	free(argv);
-	
+
 	return 0;
 }
 
-BIND_0_1(glutInitDisplayMode, int)
+BIND_0_1(glutInitDisplayMode, integer)
 #if ((GLUT_API_VERSION>=4)||(GLUT_XLIB_IMPLEMENTATION>=9))
 BIND_0_1(glutInitDisplayString, string)
 #endif
-BIND_0_2(glutInitWindowPosition, int, int)
-BIND_0_2(glutInitWindowSize, int, int)
+BIND_0_2(glutInitWindowPosition, integer, integer)
+BIND_0_2(glutInitWindowSize, integer, integer)
 BIND_0_0(glutMainLoop)
 
 /* GLUT window sub-API. */
-BIND_1_1(number, glutCreateWindow, string)
+BIND_1_1(integer, glutCreateWindow, string)
 
-int l_glutCreateSubWindow(lua_State *L){
-	lua_pushnumber(L,
-		glutCreateSubWindow(
-			luaL_checkint(L, 1),
-			luaL_checkint(L, 2),
-			luaL_checkint(L, 3),
-			luaL_checkint(L, 4),
-			luaL_checkint(L, 5)
-		)
-	);
+BIND_1_5(integer, glutCreateSubWindow, integer, integer, integer, integer, integer)
 
-	return 1;
-}
-
-BIND_0_1(glutDestroyWindow, int)
+BIND_0_1(glutDestroyWindow, integer)
 BIND_0_0(glutPostRedisplay)
 #if ((GLUT_API_VERSION>=4)||(GLUT_XLIB_IMPLEMENTATION>=11))
-BIND_0_1(glutPostWindowRedisplay, int)
+BIND_0_1(glutPostWindowRedisplay, integer)
 #endif
 BIND_0_0(glutSwapBuffers)
-BIND_1_0(number, glutGetWindow)
-BIND_0_1(glutSetWindow, int)
+BIND_1_0(integer, glutGetWindow)
+BIND_0_1(glutSetWindow, integer)
 BIND_0_1(glutSetWindowTitle, string)
 BIND_0_1(glutSetIconTitle, string)
-BIND_0_2(glutPositionWindow, int, int)
-BIND_0_2(glutReshapeWindow, int, int)
+BIND_0_2(glutPositionWindow, integer, integer)
+BIND_0_2(glutReshapeWindow, integer, integer)
 BIND_0_0(glutPopWindow)
 BIND_0_0(glutPushWindow)
 BIND_0_0(glutIconifyWindow)
@@ -65,50 +56,50 @@ BIND_0_0(glutShowWindow)
 BIND_0_0(glutHideWindow)
 #if (GLUT_API_VERSION>=3)
 BIND_0_0(glutFullScreen)
-BIND_0_1(glutSetCursor, int)
+BIND_0_1(glutSetCursor, integer)
 #if ((GLUT_API_VERSION>=4)||(GLUT_XLIB_IMPLEMENTATION>=9))
-BIND_0_2(glutWarpPointer, int, int)
+BIND_0_2(glutWarpPointer, integer, integer)
 #endif
 
 /* GLUT overlay sub-API. */
 BIND_0_0(glutEstablishOverlay)
 BIND_0_0(glutRemoveOverlay)
-BIND_0_1(glutUseLayer, int)
+BIND_0_1(glutUseLayer, integer)
 BIND_0_0(glutPostOverlayRedisplay)
 #if ((GLUT_API_VERSION>=4)||(GLUT_XLIB_IMPLEMENTATION>=11))
-BIND_0_1(glutPostWindowOverlayRedisplay, int)
+BIND_0_1(glutPostWindowOverlayRedisplay, integer)
 #endif
 BIND_0_0(glutShowOverlay)
 BIND_0_0(glutHideOverlay)
 #endif
 
 /* GLUT menu sub-API. */
-BIND_0_1(glutDestroyMenu, int)
-BIND_1_0(number, glutGetMenu)
-BIND_0_1(glutSetMenu, int)
-BIND_0_2(glutAddMenuEntry, string, int)
-BIND_0_2(glutAddSubMenu, string, int)
-BIND_0_3(glutChangeToMenuEntry, int, string, int)
-BIND_0_3(glutChangeToSubMenu, int, string, int)
-BIND_0_1(glutRemoveMenuItem, int)
-BIND_0_1(glutAttachMenu, int)
-BIND_0_1(glutDetachMenu, int)
+BIND_0_1(glutDestroyMenu, integer)
+BIND_1_0(integer, glutGetMenu)
+BIND_0_1(glutSetMenu, integer)
+BIND_0_2(glutAddMenuEntry, string, integer)
+BIND_0_2(glutAddSubMenu, string, integer)
+BIND_0_3(glutChangeToMenuEntry, integer, string, integer)
+BIND_0_3(glutChangeToSubMenu, integer, string, integer)
+BIND_0_1(glutRemoveMenuItem, integer)
+BIND_0_1(glutAttachMenu, integer)
+BIND_0_1(glutDetachMenu, integer)
 
 /* GLUT color index sub-API. */
-BIND_0_4(glutSetColor, int, number, number, number)
-BIND_1_2(number, glutGetColor, int, int)
-BIND_0_1(glutCopyColormap, int)
+BIND_0_4(glutSetColor, integer, number, number, number)
+BIND_1_2(number, glutGetColor, integer, integer)
+BIND_0_1(glutCopyColormap, integer)
 
 /* GLUT state retrieval sub-API. */
-BIND_1_1(number, glutGet, int)
-BIND_1_1(number, glutDeviceGet, int)
+BIND_1_1(integer, glutGet, integer)
+BIND_1_1(integer, glutDeviceGet, integer)
 #if (GLUT_API_VERSION>=2)
 /* GLUT extension support sub-API */
 BIND_1_1(number, glutExtensionSupported, string)
 #endif
 #if (GLUT_API_VERSION>=3)
 BIND_1_0(number, glutGetModifiers)
-BIND_1_1(number, glutLayerGet, int)
+BIND_1_1(number, glutLayerGet, integer)
 #endif
 
 /* GLUT font sub-API */
@@ -133,53 +124,57 @@ BIND_1_1(number, glutLayerGet, int)
 	(strcmp(s, "h18")==0)?  GLUT_BITMAP_HELVETICA_18 :	\
 	(luaL_error(L, "Unrecognized font: %s", s), /* ignored */GLUT_BITMAP_HELVETICA_18)
 
-int l_glutBitmapCharacter(lua_State *L){
+static int l_glutBitmapCharacter(lua_State *L)
+{
 	const char *font_name = luaL_checkstring(L, 1);
 
-	glutBitmapCharacter(STRING_TO_FONT(L, font_name), luaL_checkint(L, 2));
+	glutBitmapCharacter(STRING_TO_FONT(L, font_name), luaL_checkinteger(L, 2));
 
 	return 0;
 }
 
-int l_glutBitmapWidth(lua_State *L){
+static int l_glutBitmapWidth(lua_State *L)
+{
 	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
 
-	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutBitmapWidth must be a string of length 1.");
+	luaL_argcheck(L, strlen(c) == 1, 2, "The second argument to glutBitmapWidth must be a string of length 1.");
 	glutBitmapWidth(STRING_TO_FONT(L, font_name), (int)c[0]);
-	
+
 	return 0;
 }
 
-int l_glutStrokeCharacter(lua_State *L){
+static int l_glutStrokeCharacter(lua_State *L)
+{
 	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
-	
-	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutStrokeCharacter must be a string of length 1.");
+
+	luaL_argcheck(L, strlen(c) == 1, 2, "The second argument to glutStrokeCharacter must be a string of length 1.");
 	glutStrokeCharacter(STRING_TO_FONT(L, font_name), (int)c[0]);
-	
+
 	return 0;
 }
 
-int l_glutStrokeWidth(lua_State *L){
+static int l_glutStrokeWidth(lua_State *L)
+{
 	const char *font_name = luaL_checkstring(L, 1);
 	const char *c = luaL_checkstring(L, 2);
-	
-	luaL_argcheck(L, strlen(c)==1, 2, "The second argument to glutStrokeWidth must be a string of length 1.");
+
+	luaL_argcheck(L, strlen(c) == 1, 2, "The second argument to glutStrokeWidth must be a string of length 1.");
 	glutStrokeWidth(STRING_TO_FONT(L, font_name), (int)c[0]);
-	
+
 	return 0;
 }
 
 /* GLUT pre-built models sub-API */
-BIND_0_3(glutWireSphere, number, int, int)
-BIND_0_3(glutSolidSphere, number, int, int)
-BIND_0_4(glutWireCone, number, number, int, int)
-BIND_0_4(glutSolidCone, number, number, int, int)
+BIND_0_3(glutWireSphere, number, integer, integer)
+BIND_0_3(glutSolidSphere, number, integer, integer)
+BIND_0_4(glutWireCone, number, number, integer, integer)
+BIND_0_4(glutSolidCone, number, number, integer, integer)
 BIND_0_1(glutWireCube, number)
 BIND_0_1(glutSolidCube, number)
-BIND_0_4(glutWireTorus, number, number, int, int)
-BIND_0_4(glutSolidTorus, number, number, int, int)
+BIND_0_4(glutWireTorus, number, number, integer, integer)
+BIND_0_4(glutSolidTorus, number, number, integer, integer)
 BIND_0_0(glutWireDodecahedron)
 BIND_0_0(glutSolidDodecahedron)
 BIND_0_1(glutWireTeapot, number)
@@ -193,11 +188,11 @@ BIND_0_0(glutSolidIcosahedron)
 
 #if ((GLUT_API_VERSION>=4)||(GLUT_XLIB_IMPLEMENTATION>=9))
 /* GLUT video resize sub-API. */
-BIND_1_1(number, glutVideoResizeGet, int)
+BIND_1_1(integer, glutVideoResizeGet, integer)
 BIND_0_0(glutSetupVideoResizing)
 BIND_0_0(glutStopVideoResizing)
-BIND_0_4(glutVideoResize, int, int, int, int)
-BIND_0_4(glutVideoPan, int, int, int, int)
+BIND_0_4(glutVideoResize, integer, integer, integer, integer)
+BIND_0_4(glutVideoPan, integer, integer, integer, integer)
 
 /* GLUT debugging sub-API. */
 BIND_0_0(glutReportErrors)
@@ -208,15 +203,15 @@ BIND_0_0(glutReportErrors)
 /* glutSetKeyRepeat modes. */
 
 /* Joystick button masks. */
-BIND_0_1(glutIgnoreKeyRepeat, int)
-BIND_0_1(glutSetKeyRepeat, int)
+BIND_0_1(glutIgnoreKeyRepeat, integer)
+BIND_0_1(glutSetKeyRepeat, integer)
 BIND_0_0(glutForceJoystickFunc)
 
 /* GLUT game mode sub-API. */
 /* glutGameModeGet. */
-BIND_1_0(number, glutEnterGameMode)
+BIND_0_0(glutEnterGameMode)
 BIND_0_0(glutLeaveGameMode)
-BIND_1_1(number, glutGameModeGet, int)
+BIND_1_1(integer, glutGameModeGet, integer)
 #endif
 
 #define ENTRY(f)	{ # f, l_ ## f }
@@ -341,9 +336,9 @@ static const struct luaL_Reg glut_lib[] = {
 	{NULL, NULL},
 };
 
-int luaopen_glut(lua_State *L){
+LUALIB_API int luaopen_glut(lua_State *L)
+{
 	luaL_newlib(L, glut_lib);
-	
+
 	return 1;
 }
-
