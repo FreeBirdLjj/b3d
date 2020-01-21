@@ -1,0 +1,9 @@
+sudo: false
+language: c
+addons:
+  apt:
+    packages:
+      - freeglut3-dev
+script:
+- cd projects
+- travis_wait make
