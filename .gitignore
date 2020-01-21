@@ -12,6 +12,7 @@
 *.Plo
 tags
 
+lib/jpeg/libjpeg.pc
 lib/jpeg/config.log
 lib/jpeg/config.status
 lib/jpeg/jconfig.h
@@ -24,15 +25,6 @@ lib/jpeg/rdjpgcom
 lib/jpeg/wrjpgcom
 lib/jpeg/.deps
 lib/jpeg/.libs
-
-lib/readline/Makefile
-lib/readline/config.h
-lib/readline/config.log
-lib/readline/config.status
-lib/readline/doc/Makefile
-lib/readline/examples/Makefile
-lib/readline/shlib/Makefile
-lib/readline/stamp-h
 
 lib/lua/src/lua
 lib/lua/src/luac
